@@ -227,9 +227,27 @@
 
   <script src="./data.js"></script>
   <script>
-    const { loadData } = window.dataStore;
+    const { loadData, withCopyDefaults } = window.dataStore;
 
-    let { protocols, questions } = loadData();
+    function loadLatestData() {
+      const fallback = loadData();
+      try {
+        const storedProtocols = localStorage.getItem('protocols');
+        const storedQuestions = localStorage.getItem('questions');
+
+        if (!storedProtocols && !storedQuestions) return fallback;
+
+        return {
+          protocols: storedProtocols ? JSON.parse(storedProtocols) : fallback.protocols,
+          questions: storedQuestions ? withCopyDefaults(JSON.parse(storedQuestions)) : fallback.questions
+        };
+      } catch (err) {
+        console.warn('Failed to load stored data, falling back to defaults', err);
+        return fallback;
+      }
+    }
+
+    let { protocols, questions } = loadLatestData();
 
     let state = {
       protocolId: null,
@@ -580,7 +598,7 @@
     }
 
     function refreshFromStorage({ preserveSession = false } = {}) {
-      const loaded = loadData();
+      const loaded = loadLatestData();
       protocols = loaded.protocols;
       questions = loaded.questions;
 
