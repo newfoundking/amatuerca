@@ -147,8 +147,9 @@
     </section>
   </div>
 
-  <script type="module">
-    import { loadData, saveData, resetData } from './data.js';
+  <script src="./data.js"></script>
+  <script>
+    const { loadData, saveData, resetData } = window.dataStore;
 
     let { protocols, questions } = loadData();
     let selectedProtocol = null;
