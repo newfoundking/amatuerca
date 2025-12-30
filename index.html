@@ -221,8 +221,9 @@
     </section>
   </div>
 
-  <script type="module">
-    import { loadData } from './data.js';
+  <script src="./data.js"></script>
+  <script>
+    const { loadData } = window.dataStore;
 
     let { protocols, questions } = loadData();
 
