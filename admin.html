@@ -102,6 +102,23 @@
         </div>
 
         <div>
+          <h3 style="margin:0 0 .35rem;">Copy settings</h3>
+          <div class="sub" style="margin:0 0 .75rem;">Choose what information is included when copying the transcript.</div>
+          <label style="display:flex; align-items:center; gap:.5rem;">
+            <input type="checkbox" id="includeProtocolName" style="width:auto;"> Include protocol name
+          </label>
+          <label style="display:flex; align-items:center; gap:.5rem;">
+            <input type="checkbox" id="includeProtocolSummary" style="width:auto;"> Include protocol summary
+          </label>
+          <label style="display:flex; align-items:center; gap:.5rem;">
+            <input type="checkbox" id="includeQuestionText" style="width:auto;"> Include full questions
+          </label>
+          <label style="display:flex; align-items:center; gap:.5rem;">
+            <input type="checkbox" id="includeAnswerText" style="width:auto;"> Include answers
+          </label>
+        </div>
+
+        <div>
           <h3 style="margin:0 0 .35rem;">Questions</h3>
           <div class="sub" style="margin:0 0 .75rem;">Build your flow using prompts, optional details, and answers that point to the next question key.</div>
           <div class="actions" style="margin-bottom:.65rem;">
@@ -149,9 +166,10 @@
 
   <script src="./data.js"></script>
   <script>
-    const { loadData, saveData, resetData } = window.dataStore;
+    const { loadData, saveData, resetData, defaultCopySettings } = window.dataStore;
 
-    let { protocols, questions } = loadData();
+    let { protocols, questions, copySettings } = loadData();
+    copySettings = copySettings || defaultCopySettings;
     let selectedProtocol = null;
     let selectedQuestion = null;
 
@@ -175,6 +193,11 @@
     const questionAction = document.getElementById('questionAction');
     const questionOutcome = document.getElementById('questionOutcome');
     const answersEl = document.getElementById('answers');
+
+    const includeProtocolName = document.getElementById('includeProtocolName');
+    const includeProtocolSummary = document.getElementById('includeProtocolSummary');
+    const includeQuestionText = document.getElementById('includeQuestionText');
+    const includeAnswerText = document.getElementById('includeAnswerText');
 
     const newProtocolBtn = document.getElementById('newProtocol');
     const saveProtocolBtn = document.getElementById('saveProtocol');
@@ -201,26 +224,32 @@
     function renderQuestions() {
       questionList.innerHTML = '';
       const entries = Object.keys(questions).sort();
-      entries.forEach((key) => {
+      const scopedEntries = selectedProtocol
+        ? entries.filter((key) => key.startsWith(`${selectedProtocol.id}.`))
+        : entries;
+      scopedEntries.forEach((key) => {
         const div = document.createElement('div');
         div.className = `item ${selectedQuestion === key ? 'active' : ''}`;
         div.innerHTML = `<strong>${key}</strong><div style="color:var(--muted); font-size:.9rem;">${questions[key].prompt}</div>`;
         div.onclick = () => selectQuestion(key);
         questionList.appendChild(div);
       });
-      questionCount.textContent = `${entries.length} total questions`;
+      const meta = selectedProtocol ? `${scopedEntries.length} of ${entries.length}` : `${entries.length}`;
+      questionCount.textContent = `${meta} questions`;
     }
 
     function selectProtocol(id) {
       const protocol = protocols.find((p) => p.id === id);
       if (!protocol) return;
       selectedProtocol = protocol;
+      selectedQuestion = null;
       protocolId.value = protocol.id;
       protocolName.value = protocol.name;
       protocolSummary.value = protocol.summary || '';
       protocolCategory.value = protocol.category || '';
       protocolEntry.value = protocol.entry || '';
       renderProtocols();
+      renderQuestions();
     }
 
     function clearProtocolForm() {
@@ -231,6 +260,7 @@
       protocolCategory.value = '';
       protocolEntry.value = '';
       renderProtocols();
+      renderQuestions();
     }
 
     function saveProtocol() {
@@ -358,7 +388,7 @@
     function saveAll() {
       saveProtocol();
       saveQuestion();
-      saveData(protocols, questions);
+      saveData(protocols, questions, copySettings || defaultCopySettings);
       alert('Saved! Open the questionnaire page to see your updates.');
     }
 
@@ -366,10 +396,28 @@
       const reset = resetData();
       protocols = reset.protocols;
       questions = reset.questions;
+      copySettings = reset.copySettings;
       clearProtocolForm();
       clearQuestionForm();
       renderProtocols();
       renderQuestions();
+      renderCopySettings();
+    }
+
+    function renderCopySettings() {
+      includeProtocolName.checked = Boolean(copySettings?.includeProtocolName);
+      includeProtocolSummary.checked = Boolean(copySettings?.includeProtocolSummary);
+      includeQuestionText.checked = Boolean(copySettings?.includeQuestionText);
+      includeAnswerText.checked = Boolean(copySettings?.includeAnswerText);
+    }
+
+    function updateCopySettings() {
+      copySettings = {
+        includeProtocolName: includeProtocolName.checked,
+        includeProtocolSummary: includeProtocolSummary.checked,
+        includeQuestionText: includeQuestionText.checked,
+        includeAnswerText: includeAnswerText.checked,
+      };
     }
 
     newProtocolBtn.onclick = clearProtocolForm;
@@ -381,9 +429,14 @@
     deleteQuestionBtn.onclick = deleteQuestion;
     saveAllBtn.onclick = saveAll;
     loadDefaultsBtn.onclick = loadDefaults;
+    includeProtocolName.onchange = updateCopySettings;
+    includeProtocolSummary.onchange = updateCopySettings;
+    includeQuestionText.onchange = updateCopySettings;
+    includeAnswerText.onchange = updateCopySettings;
 
     renderProtocols();
     renderQuestions();
+    renderCopySettings();
   </script>
 </body>
 </html>
