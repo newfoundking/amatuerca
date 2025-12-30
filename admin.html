@@ -121,6 +121,18 @@
               <button class="btn" id="addAnswer">Add answer</button>
             </div>
             <div class="answers" id="answers"></div>
+            <div class="actions" style="margin:.35rem 0; align-items:center;">
+              <span class="tag">Free-text entry</span>
+              <label style="display:flex; align-items:center; gap:.35rem; color:var(--muted);">
+                <input type="checkbox" id="questionTextEnabled" style="width:auto;"> Enable typed response
+              </label>
+            </div>
+            <label for="questionTextLabel">Text field label</label>
+            <input id="questionTextLabel" placeholder="Describe cardiac history">
+            <label for="questionTextPlaceholder">Placeholder</label>
+            <input id="questionTextPlaceholder" placeholder="E.g., pacemaker, stents, meds">
+            <label for="questionTextNext">Next question key</label>
+            <input id="questionTextNext" placeholder="card-10.priority">
             <label for="questionAction">Action (optional)</label>
             <textarea id="questionAction" placeholder="Instructions given before responders arrive."></textarea>
             <label for="questionOutcome">Outcome (optional)</label>
@@ -155,6 +167,10 @@
     const questionId = document.getElementById('questionId');
     const questionPrompt = document.getElementById('questionPrompt');
     const questionDetail = document.getElementById('questionDetail');
+    const questionTextEnabled = document.getElementById('questionTextEnabled');
+    const questionTextLabel = document.getElementById('questionTextLabel');
+    const questionTextPlaceholder = document.getElementById('questionTextPlaceholder');
+    const questionTextNext = document.getElementById('questionTextNext');
     const questionAction = document.getElementById('questionAction');
     const questionOutcome = document.getElementById('questionOutcome');
     const answersEl = document.getElementById('answers');
@@ -249,6 +265,10 @@
       questionId.value = id;
       questionPrompt.value = question.prompt || '';
       questionDetail.value = question.detail || '';
+      questionTextEnabled.checked = Boolean(question.textEntry);
+      questionTextLabel.value = question.textEntry?.label || '';
+      questionTextPlaceholder.value = question.textEntry?.placeholder || '';
+      questionTextNext.value = question.textEntry?.next || '';
       questionAction.value = question.action || '';
       questionOutcome.value = question.outcome || '';
       renderAnswerRows(question.answers || []);
@@ -260,6 +280,10 @@
       questionId.value = '';
       questionPrompt.value = '';
       questionDetail.value = '';
+      questionTextEnabled.checked = false;
+      questionTextLabel.value = '';
+      questionTextPlaceholder.value = '';
+      questionTextNext.value = '';
       questionAction.value = '';
       questionOutcome.value = '';
       renderAnswerRows([]);
@@ -309,6 +333,14 @@
         detail: questionDetail.value.trim(),
         answers: collectAnswers(),
       };
+      if (questionTextEnabled.checked) {
+        if (!questionTextNext.value.trim()) return alert('Next question key is required for text entry.');
+        payload.textEntry = {
+          label: questionTextLabel.value.trim(),
+          placeholder: questionTextPlaceholder.value.trim(),
+          next: questionTextNext.value.trim(),
+        };
+      }
       if (questionAction.value.trim()) payload.action = questionAction.value.trim();
       if (questionOutcome.value.trim()) payload.outcome = questionOutcome.value.trim();
       questions[questionId.value.trim()] = payload;
