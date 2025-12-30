@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProQA Style Questionnaire</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22d3ee;
+      --accent-2: #a855f7;
+      --danger: #f43f5e;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.08), transparent 25%),
+                  radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.1), transparent 30%),
+                  var(--bg);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 0 1rem 2rem;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: -0.01em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .35rem .75rem;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: .08em;
+      font-size: .75rem;
+    }
+
+    .grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(6px);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: .25rem;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+
+    .panel p {
+      color: var(--muted);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: .95rem;
+    }
+
+    .protocol-list {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    .protocol {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: .85rem;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: border-color 120ms ease, transform 120ms ease;
+    }
+
+    .protocol:hover { border-color: rgba(34, 211, 238, 0.6); transform: translateY(-1px); }
+    .protocol.active { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35); }
+
+    .protocol small { color: var(--muted); display: block; margin-top: .25rem; }
+
+    .question-card {
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .question-title {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.015em;
+    }
+
+    .meta {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: .4rem .75rem;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .options {
+      display: grid;
+      gap: .75rem;
+    }
+
+    button.option {
+      width: 100%;
+      padding: .95rem 1.1rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(34, 211, 238, 0.08);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      transition: transform 120ms ease, border-color 120ms ease;
+    }
+
+    button.option:hover { transform: translateY(-1px); border-color: rgba(34, 211, 238, 0.5); }
+
+    .option .tag { font-size: .8rem; color: var(--muted); }
+
+    .actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+    .ghost-btn, .primary-btn {
+      border-radius: 12px;
+      padding: .75rem 1rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .primary-btn { background: linear-gradient(120deg, var(--accent), var(--accent-2)); border: none; color: #0b1224; }
+
+    .transcript {
+      display: grid;
+      gap: .75rem;
+      max-height: 480px;
+      overflow: auto;
+      padding-right: .25rem;
+    }
+
+    .entry {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: .85rem;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .entry strong { display: block; margin-bottom: .25rem; }
+
+    .outcome {
+      border-radius: 14px;
+      padding: 1rem;
+      background: linear-gradient(120deg, rgba(34, 197, 94, 0.12), rgba(16, 185, 129, 0.08));
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+
+    .hint { color: var(--muted); font-size: .85rem; margin-top: -.35rem; }
+
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="badge">Live Scenario Guide</div>
+      <h1>ProQA Style Questionnaire</h1>
+      <p style="color: var(--muted); max-width: 720px; margin: .4rem 0 0;">Rapidly guide call takers through critical emergency protocols. Select a scenario, step through dynamically branching questions, and capture a clean transcript for handoff.</p>
+    </div>
+    <div class="pill">Status: Ready for deployment</div>
+  </header>
+
+  <div class="grid">
+    <aside class="panel">
+      <h2>Protocols</h2>
+      <p>Select the appropriate entry based on caller statement.</p>
+      <div class="protocol-list" id="protocolList"></div>
+    </aside>
+
+    <section class="panel" aria-live="polite">
+      <div class="question-card" id="questionCard">
+        <h3 class="question-title">Choose a protocol to begin</h3>
+        <p class="hint">No active questionnaire.</p>
+        <div class="options"></div>
+      </div>
+      <div class="panel" style="margin-top:1rem;">
+        <h2>Transcript</h2>
+        <p>Every question and answer captured for handoff.</p>
+        <div class="transcript" id="transcript"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const protocols = [
+      {
+        id: 'card-10',
+        name: 'Card 10: Chest Pain (Non-Traumatic)',
+        summary: 'Investigate cardiac red flags, aspirin, and transport priority.',
+        entry: 'card-10.entry',
+        category: 'Medical'
+      },
+      {
+        id: 'card-69',
+        name: 'Card 69: Structure Fire',
+        summary: 'Size-up smoke, entrapment, and hazards prior to dispatch.',
+        entry: 'card-69.entry',
+        category: 'Fire'
+      }
+    ];
+
+    const questions = {
+      'card-10.entry': {
+        prompt: 'Tell me exactly what happened.',
+        detail: 'Capture chief complaint to confirm chest pain and screen for trauma.',
+        answers: [
+          { label: 'Adult with chest tightness, no injury', next: 'card-10.c' },
+          { label: 'Chest pain after fall or trauma', next: 'card-10.trauma' },
+          { label: 'Unconscious or not breathing effectively', next: 'card-10.cpr' }
+        ]
+      },
+      'card-10.c': {
+        prompt: 'Is the patient breathing normally?',
+        detail: 'Check for effective respirations to rule out respiratory arrest.',
+        answers: [
+          { label: 'Yes, breathing normally', next: 'card-10.color' },
+          { label: 'No / barely breathing', next: 'card-10.cpr' }
+        ]
+      },
+      'card-10.color': {
+        prompt: 'Is the patient awake and able to speak?',
+        detail: 'Assess perfusion and mental status for priority symptoms.',
+        answers: [
+          { label: 'Awake and speaking', next: 'card-10.aspirin' },
+          { label: 'Faint / difficult to wake', next: 'card-10.priority' }
+        ]
+      },
+      'card-10.aspirin': {
+        prompt: 'Has the patient taken aspirin today?',
+        detail: 'Follow agency protocol for aspirin administration if allowed.',
+        answers: [
+          { label: 'No or unknown', next: 'card-10.give-aspirin' },
+          { label: 'Yes, already took', next: 'card-10.priority' }
+        ]
+      },
+      'card-10.give-aspirin': {
+        prompt: 'Is the patient allergic to aspirin or under 16 years old?',
+        detail: 'Contraindications for aspirin administration.',
+        answers: [
+          { label: 'No allergy and age 16+', next: 'card-10.priority' },
+          { label: 'Allergy / under 16 / unsure', next: 'card-10.priority' }
+        ],
+        action: 'If agency approved, have patient chew 325mg aspirin unless contraindicated.'
+      },
+      'card-10.priority': {
+        prompt: 'Dispatch priority',
+        answers: [],
+        outcome: 'Send closest ALS. Monitor airway and prepare for CPR instructions if condition worsens.'
+      },
+      'card-10.cpr': {
+        prompt: 'Begin CPR instructions immediately',
+        answers: [],
+        outcome: 'Start compressions, 100-120/min. Continue until responders take over.'
+      },
+      'card-10.trauma': {
+        prompt: 'Redirect to trauma protocol',
+        answers: [],
+        outcome: 'Switch to appropriate trauma card and request additional resources.'
+      },
+
+      'card-69.entry': {
+        prompt: 'What exactly is burning?',
+        detail: 'Determine structure type and hazards.',
+        answers: [
+          { label: 'House or apartment', next: 'card-69.occupancy' },
+          { label: 'Commercial / industrial', next: 'card-69.hazmat' },
+          { label: 'Vegetation / wildland', next: 'card-69.wildland' }
+        ]
+      },
+      'card-69.occupancy': {
+        prompt: 'Is anyone trapped or unable to evacuate?',
+        detail: 'Identify entrapment for rescue assignment.',
+        answers: [
+          { label: 'Yes, people trapped', next: 'card-69.rescue' },
+          { label: 'No, everyone outside', next: 'card-69.exposures' },
+          { label: 'Unknown', next: 'card-69.exposures' }
+        ]
+      },
+      'card-69.rescue': {
+        prompt: 'Number of people trapped and location?',
+        detail: 'Gather critical information for first-arriving companies.',
+        answers: [
+          { label: 'Provide details', next: 'card-69.exposures' },
+          { label: 'Information unavailable', next: 'card-69.exposures' }
+        ],
+        action: 'Advise occupants to close doors, stay low, and await rescue if trapped.'
+      },
+      'card-69.exposures': {
+        prompt: 'Any hazards like gas leaks, weapons, or downed wires?',
+        detail: 'Safety concerns that change staging distance and PPE.',
+        answers: [
+          { label: 'Hazards present', next: 'card-69.priority' },
+          { label: 'No hazards reported', next: 'card-69.priority' }
+        ]
+      },
+      'card-69.hazmat': {
+        prompt: 'Is this a known chemical or hazmat facility?',
+        detail: 'Flags for hazmat response level and isolation distance.',
+        answers: [
+          { label: 'Yes / suspected', next: 'card-69.priority' },
+          { label: 'No', next: 'card-69.priority' }
+        ],
+        action: 'Keep caller at a safe distance; avoid attempting to extinguish industrial fires.'
+      },
+      'card-69.wildland': {
+        prompt: 'How close is the fire to structures or people?',
+        detail: 'Evaluates threat to life and property for evacuations.',
+        answers: [
+          { label: '< 1/4 mile or impacting structures', next: 'card-69.priority' },
+          { label: 'Distant from structures', next: 'card-69.priority' }
+        ],
+        action: 'Advise caller to move upwind and prepare to evacuate if conditions change.'
+      },
+      'card-69.priority': {
+        prompt: 'Dispatch priority',
+        answers: [],
+        outcome: 'Send full first-alarm assignment. Provide staging location and confirm hydrant availability.'
+      }
+    };
+
+    let state = {
+      protocolId: null,
+      currentQuestion: null,
+      stack: [],
+      transcript: []
+    };
+
+    const protocolList = document.getElementById('protocolList');
+    const questionCard = document.getElementById('questionCard');
+    const transcriptEl = document.getElementById('transcript');
+
+    function renderProtocols() {
+      protocolList.innerHTML = '';
+      protocols.forEach((p) => {
+        const div = document.createElement('div');
+        div.className = `protocol ${state.protocolId === p.id ? 'active' : ''}`;
+        div.innerHTML = `<strong>${p.name}</strong><small>${p.summary}</small>`;
+        div.onclick = () => startProtocol(p.id);
+        protocolList.appendChild(div);
+      });
+    }
+
+    function startProtocol(id) {
+      const protocol = protocols.find((p) => p.id === id);
+      if (!protocol) return;
+      state = { protocolId: id, currentQuestion: protocol.entry, stack: [], transcript: [] };
+      renderProtocols();
+      renderQuestion();
+      renderTranscript();
+    }
+
+    function renderQuestion() {
+      const node = questions[state.currentQuestion];
+      const options = node?.answers ?? [];
+      questionCard.innerHTML = '';
+
+      const title = document.createElement('h3');
+      title.className = 'question-title';
+      title.textContent = node ? node.prompt : 'Choose a protocol to begin';
+      questionCard.appendChild(title);
+
+      if (node?.detail) {
+        const detail = document.createElement('p');
+        detail.className = 'hint';
+        detail.textContent = node.detail;
+        questionCard.appendChild(detail);
+      }
+
+      if (node?.action) {
+        const action = document.createElement('div');
+        action.className = 'pill';
+        action.style.background = 'rgba(34, 197, 94, 0.08)';
+        action.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+        action.style.color = 'var(--success)';
+        action.textContent = node.action;
+        questionCard.appendChild(action);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `
+        <span class="pill">Protocol: ${state.protocolId ?? 'Not selected'}</span>
+        <span class="pill">Step ${state.stack.length + 1}</span>
+      `;
+      questionCard.appendChild(meta);
+
+      const optionsWrap = document.createElement('div');
+      optionsWrap.className = 'options';
+
+      if (node?.outcome) {
+        const outcome = document.createElement('div');
+        outcome.className = 'outcome';
+        outcome.innerHTML = `<strong>Outcome</strong><div>${node.outcome}</div>`;
+        optionsWrap.appendChild(outcome);
+      }
+
+      options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.innerHTML = `<span>${opt.label}</span><span class="tag">${String.fromCharCode(65 + idx)}</span>`;
+        btn.onclick = () => handleAnswer(node, opt);
+        optionsWrap.appendChild(btn);
+      });
+
+      questionCard.appendChild(optionsWrap);
+
+      const footer = document.createElement('div');
+      footer.className = 'actions';
+
+      const backBtn = document.createElement('button');
+      backBtn.className = 'ghost-btn';
+      backBtn.textContent = 'Back';
+      backBtn.disabled = state.stack.length === 0;
+      backBtn.onclick = () => goBack();
+      footer.appendChild(backBtn);
+
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'primary-btn';
+      resetBtn.textContent = 'Reset';
+      resetBtn.onclick = reset;
+      footer.appendChild(resetBtn);
+
+      questionCard.appendChild(footer);
+    }
+
+    function handleAnswer(node, answer) {
+      if (!node) return;
+      state.transcript.push({ question: node.prompt, answer: answer.label });
+      if (answer.next) {
+        state.stack.push(state.currentQuestion);
+        state.currentQuestion = answer.next;
+      }
+      renderQuestion();
+      renderTranscript();
+    }
+
+    function goBack() {
+      const previous = state.stack.pop();
+      if (!previous) return;
+      state.currentQuestion = previous;
+      state.transcript.pop();
+      renderQuestion();
+      renderTranscript();
+    }
+
+    function reset() {
+      state = { protocolId: null, currentQuestion: null, stack: [], transcript: [] };
+      renderProtocols();
+      renderQuestion();
+      renderTranscript();
+    }
+
+    function renderTranscript() {
+      transcriptEl.innerHTML = '';
+      if (!state.transcript.length) {
+        const empty = document.createElement('div');
+        empty.className = 'hint';
+        empty.textContent = 'No transcript yet. Start a protocol to capture Q&A.';
+        transcriptEl.appendChild(empty);
+        return;
+      }
+
+      state.transcript.forEach((entry, idx) => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `<strong>Q${idx + 1}: ${entry.question}</strong><div>${entry.answer}</div>`;
+        transcriptEl.appendChild(div);
+      });
+    }
+
+    renderProtocols();
+    renderQuestion();
+  </script>
+</body>
+</html>
