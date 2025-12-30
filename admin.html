@@ -53,7 +53,7 @@
     .btn.danger { border-color: rgba(244, 63, 94, 0.6); color: #fca5a5; }
 
     .answers { display: grid; gap: .5rem; }
-    .answer-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: .5rem; align-items: center; }
+    .answer-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: .5rem; align-items: center; }
     .tag { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .65rem; border-radius: 999px; background: rgba(255,255,255,0.05); color: var(--muted); font-size: .85rem; }
 
     @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } header { flex-direction: column; align-items: flex-start; } }
@@ -330,15 +330,16 @@
         answersEl.appendChild(hint);
         return;
       }
-      list.forEach((answer, idx) => addAnswerRow(answer.label, answer.next, idx));
+      list.forEach((answer, idx) => addAnswerRow(answer.label, answer.next, idx, answer.aliases));
     }
 
-    function addAnswerRow(label = '', next = '', index = null) {
+    function addAnswerRow(label = '', next = '', index = null, aliases = []) {
       const row = document.createElement('div');
       row.className = 'answer-row';
       row.innerHTML = `
         <input placeholder="Answer label" value="${label.replace(/"/g, '&quot;')}">
         <input placeholder="Next question key" value="${next.replace(/"/g, '&quot;')}">
+        <input placeholder="Aliases (comma separated)" value="${(aliases || []).join(', ')}">
         <button class="btn danger" aria-label="Remove answer">✕</button>
       `;
       const removeBtn = row.querySelector('button');
@@ -352,8 +353,12 @@
 
     function collectAnswers() {
       return Array.from(answersEl.querySelectorAll('.answer-row')).map((row) => {
-        const [labelInput, nextInput] = row.querySelectorAll('input');
-        return { label: labelInput.value.trim(), next: nextInput.value.trim() };
+        const [labelInput, nextInput, aliasInput] = row.querySelectorAll('input');
+        const aliases = aliasInput.value
+          .split(',')
+          .map((a) => a.trim())
+          .filter(Boolean);
+        return { label: labelInput.value.trim(), next: nextInput.value.trim(), aliases };
       }).filter((a) => a.label && a.next);
     }
 

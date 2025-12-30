@@ -42,17 +42,17 @@
       prompt: 'Tell me exactly what happened.',
       detail: 'Capture chief complaint to confirm chest pain and screen for trauma.',
       answers: [
-        { label: 'Adult with chest tightness, no injury', next: 'card-10.abcs' },
-        { label: 'Chest pain after fall or trauma', next: 'card-10.trauma' },
-        { label: 'Unconscious or not breathing effectively', next: 'card-10.cpr' }
+        { label: 'Adult with chest tightness, no injury', next: 'card-10.abcs', aliases: ['medical', 'non trauma', 'nt'] },
+        { label: 'Chest pain after fall or trauma', next: 'card-10.trauma', aliases: ['trauma', 'injury'] },
+        { label: 'Unconscious or not breathing effectively', next: 'card-10.cpr', aliases: ['cpr', 'unconscious'] }
       ]
     },
     'card-10.abcs': {
       prompt: 'Is the patient breathing normally?',
       detail: 'Check for effective respirations to rule out respiratory arrest.',
       answers: [
-        { label: 'Yes, breathing normally', next: 'card-10.color' },
-        { label: 'No / barely breathing', next: 'card-10.cpr' }
+        { label: 'Yes, breathing normally', next: 'card-10.color', aliases: ['yes', 'normal'] },
+        { label: 'No / barely breathing', next: 'card-10.cpr', aliases: ['no', 'poor', 'apnea'] }
       ],
       action: 'If breathing is abnormal, prepare to coach assisted ventilations or CPR.'
     },
@@ -60,8 +60,8 @@
       prompt: 'Is the patient awake and able to speak?',
       detail: 'Assess perfusion and mental status for priority symptoms.',
       answers: [
-        { label: 'Awake and speaking', next: 'card-10.onset' },
-        { label: 'Faint / difficult to wake', next: 'card-10.priority' }
+        { label: 'Awake and speaking', next: 'card-10.onset', aliases: ['awake', 'alert'] },
+        { label: 'Faint / difficult to wake', next: 'card-10.priority', aliases: ['faint', 'unresponsive'] }
       ]
     },
     'card-10.onset': {
