@@ -579,11 +579,25 @@
       });
     }
 
-    function refreshFromStorage() {
+    function refreshFromStorage({ preserveSession = false } = {}) {
       const loaded = loadData();
       protocols = loaded.protocols;
       questions = loaded.questions;
-      reset();
+
+      const protocolStillExists = protocols.some((p) => p.id === state.protocolId);
+      const questionStillExists = questions[state.currentQuestion];
+
+      if (preserveSession && protocolStillExists) {
+        if (!questionStillExists) {
+          state.currentQuestion = null;
+          state.stack = [];
+        }
+        renderProtocols();
+        renderQuestion();
+        renderTranscript();
+      } else {
+        reset();
+      }
     }
 
     codeInput.addEventListener('input', (e) => startProtocolByCode(e.target.value));
@@ -607,7 +621,9 @@
     });
     copyButton.addEventListener('click', copyTranscriptToClipboard);
     copyNewButton.addEventListener('click', copyNewTranscriptToClipboard);
-    window.addEventListener('storage', refreshFromStorage);
+    window.addEventListener('storage', () => refreshFromStorage({ preserveSession: true }));
+    window.addEventListener('pageshow', () => refreshFromStorage({ preserveSession: true }));
+    window.addEventListener('focus', () => refreshFromStorage({ preserveSession: true }));
 
     renderProtocols();
     renderQuestion();
