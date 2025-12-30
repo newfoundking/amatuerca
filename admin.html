@@ -18,146 +18,327 @@
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: var(--bg);
+      background: radial-gradient(circle at 16% 14%, rgba(34, 211, 238, 0.08), transparent 28%),
+                  radial-gradient(circle at 84% 0%, rgba(168, 85, 247, 0.1), transparent 32%),
+                  var(--bg);
       color: var(--text);
       font-family: "Inter", system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
       padding: 2rem 1rem 3rem;
     }
 
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    header { max-width: 1200px; margin: 0 auto 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    header {
+      max-width: 1280px;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
     h1 { margin: 0; letter-spacing: -0.02em; }
-    .sub { color: var(--muted); margin-top: .35rem; max-width: 720px; }
+    .sub { color: var(--muted); margin-top: .35rem; max-width: 760px; line-height: 1.5; }
 
-    .grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; gap: 1.25rem; }
-    .panel { background: rgba(17, 24, 39, 0.94); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; box-shadow: 0 30px 80px rgba(0,0,0,0.32); }
-    .panel h2 { margin: 0 0 .35rem; }
-    .panel p { margin: 0 0 1rem; color: var(--muted); }
+    .toolbar {
+      max-width: 1280px;
+      margin: 0 auto 1rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+      align-items: end;
+    }
 
-    .list { display: grid; gap: .35rem; max-height: 420px; overflow: auto; padding-right: .25rem; }
-    .item { padding: .65rem .75rem; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; background: rgba(255,255,255,0.02); }
-    .item.active { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35); }
-
-    label { display: block; font-weight: 600; margin-bottom: .35rem; }
-    input, textarea, select { width: 100%; padding: .7rem .8rem; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text); font-family: inherit; }
-    textarea { min-height: 100px; resize: vertical; }
-
-    .stack { display: grid; gap: .75rem; }
     .actions { display: flex; gap: .65rem; flex-wrap: wrap; }
-    .btn { border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text); padding: .75rem 1rem; cursor: pointer; font-weight: 600; }
+    .btn {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: .75rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
     .btn.primary { background: linear-gradient(120deg, var(--accent), var(--accent-2)); border: none; color: #0b1224; }
     .btn.danger { border-color: rgba(244, 63, 94, 0.6); color: #fca5a5; }
+    .btn.ghost { background: transparent; }
 
-    .answers { display: grid; gap: .5rem; }
-    .answer-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: .5rem; align-items: center; }
-    .tag { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .65rem; border-radius: 999px; background: rgba(255,255,255,0.05); color: var(--muted); font-size: .85rem; }
+    .field { display: grid; gap: .35rem; }
+    label { font-weight: 600; }
+    input, textarea, select {
+      width: 100%;
+      padding: .7rem .8rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-family: inherit;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .hint { color: var(--muted); font-size: .9rem; }
 
-    @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } header { flex-direction: column; align-items: flex-start; } }
+    .layout {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 1rem;
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.32);
+    }
+
+    .protocol-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: .85rem;
+      margin-top: .75rem;
+    }
+
+    .protocol-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: .85rem;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      display: grid;
+      gap: .35rem;
+      transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+    }
+    .protocol-card:hover { border-color: rgba(34, 211, 238, 0.6); transform: translateY(-1px); }
+    .protocol-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(34,211,238,0.35); }
+    .protocol-card small { color: var(--muted); }
+    .pill { display: inline-flex; padding: .25rem .55rem; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--muted); font-size: .85rem; }
+
+    .drawer {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(140deg, rgba(17,24,39,0.95), rgba(15,23,42,0.92));
+      min-height: 720px;
+    }
+    .drawer.empty { display: grid; place-items: center; color: var(--muted); padding: 2rem; }
+
+    .drawer .inner { padding: 1.25rem; display: grid; gap: 1rem; }
+    .drawer-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .drawer-title { margin: 0; }
+
+    .section { border: 1px solid var(--border); border-radius: 14px; padding: 1rem; background: rgba(255,255,255,0.02); display: grid; gap: .75rem; }
+    .section h3 { margin: 0; }
+
+    .two-col { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+    .question-list { display: grid; gap: .45rem; max-height: 240px; overflow: auto; padding-right: .35rem; }
+    .question-item { border: 1px solid var(--border); border-radius: 12px; padding: .65rem .75rem; cursor: pointer; background: rgba(255,255,255,0.02); display: grid; gap: .25rem; }
+    .question-item:hover { border-color: rgba(34, 211, 238, 0.5); }
+    .question-item.active { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(34,211,238,0.35); }
+
+    .answer-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) auto; gap: .5rem; align-items: center; }
+    .answer-row button { height: 44px; }
+
+    .inline { display: flex; align-items: center; gap: .5rem; }
+
+    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } .toolbar { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <header>
     <div>
       <h1>Admin Workspace</h1>
-      <div class="sub">Manage protocols and branching flows with a friendly form-based editor. Changes are saved to your browser storage and reflected on the main questionnaire page.</div>
+      <div class="sub">Manage protocols, questions, and transcript copy text with a guided editor. Everything saves locally so you can experiment freely before exporting.</div>
     </div>
     <div class="actions">
       <a class="btn" href="index.html">Back to questionnaire</a>
-      <button class="btn" id="loadDefaults">Load defaults</button>
-      <button class="btn primary" id="saveAll">Save all changes</button>
     </div>
   </header>
 
-  <div class="grid">
-    <aside class="panel">
-      <h2>Protocols</h2>
-      <p>Select a protocol to edit or create a new one.</p>
-      <div class="list" id="protocolList"></div>
-      <button class="btn primary" style="margin-top:.75rem; width:100%;" id="newProtocol">New protocol</button>
-    </aside>
+  <div class="toolbar">
+    <div class="field">
+      <label for="protocolSearch">Short code search</label>
+      <input id="protocolSearch" placeholder="Search by code or title (e.g., card-10)">
+      <div class="hint">Type a short-code or title to filter the catalog. Press Enter on a single match to open it.</div>
+    </div>
+    <div class="actions" style="justify-content:flex-end; align-items:flex-end;">
+      <button class="btn" id="loadDefaults">Load defaults</button>
+      <button class="btn primary" id="saveAll">Save all changes</button>
+    </div>
+  </div>
 
+  <div class="layout">
     <section class="panel">
-      <div class="stack">
-        <div>
-          <h3 style="margin:0 0 .35rem;">Protocol details</h3>
-          <div class="sub" style="margin:0 0 .75rem;">Update code, title, summary, category, and entry question key.</div>
-          <label for="protocolId">Protocol code</label>
-          <input id="protocolId" placeholder="card-10">
-          <label for="protocolName">Display name</label>
-          <input id="protocolName" placeholder="Card 10: Chest Pain">
-          <label for="protocolSummary">Summary</label>
-          <textarea id="protocolSummary" placeholder="What this protocol is used for"></textarea>
-          <label for="protocolCategory">Category</label>
-          <input id="protocolCategory" placeholder="Medical">
-          <label for="protocolEntry">Entry question key</label>
-          <input id="protocolEntry" placeholder="card-10.entry">
-          <div class="actions" style="margin-top:.65rem;">
+      <div class="section">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap: .5rem; flex-wrap:wrap;">
+          <div>
+            <h3 style="margin:0;">Protocols</h3>
+            <div class="hint">Card grid with quick summaries and category labels.</div>
+          </div>
+          <button class="btn primary" id="newProtocol">Create protocol</button>
+        </div>
+        <div class="protocol-grid" id="protocolGrid"></div>
+      </div>
+    </section>
+
+    <section class="drawer" id="editorDrawer">
+      <div class="inner">
+        <div class="drawer-header">
+          <div>
+            <h2 class="drawer-title" id="drawerTitle">Select a protocol to edit</h2>
+            <div class="hint" id="drawerHint">Pick a card on the left or start a new one. Required fields are highlighted.</div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" id="discardChanges">Discard</button>
             <button class="btn primary" id="saveProtocol">Save protocol</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Protocol basics</h3>
+          <div class="two-col">
+            <div class="field">
+              <label for="protocolName">Protocol title</label>
+              <input id="protocolName" placeholder="Card 10: Chest Pain">
+              <div class="hint">Used everywhere the protocol is displayed. Changing the title regenerates the short code unless you lock it.</div>
+            </div>
+            <div class="field">
+              <label for="protocolId">Short code (auto)</label>
+              <div class="inline">
+                <input id="protocolId" aria-label="Protocol code" readonly>
+                <button class="btn" id="regenerateCode" type="button">Regenerate</button>
+              </div>
+              <div class="hint">Slugged from the title and kept unique automatically.</div>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="protocolSummary">Summary</label>
+              <textarea id="protocolSummary" placeholder="What this protocol is used for"></textarea>
+            </div>
+            <div class="field">
+              <label for="protocolCategory">Category</label>
+              <input id="protocolCategory" placeholder="Medical">
+              <div class="hint">Add a short grouping label for the card grid.</div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="protocolEntry">Entry question key</label>
+            <input id="protocolEntry" placeholder="auto-generated when saved">
+            <div class="hint">We’ll default to &lt;short-code&gt;.entry if left blank.</div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="saveProtocolSecondary">Save basics</button>
             <button class="btn danger" id="deleteProtocol">Delete protocol</button>
           </div>
         </div>
 
-        <div>
-          <h3 style="margin:0 0 .35rem;">Copy settings</h3>
-          <div class="sub" style="margin:0 0 .75rem;">Choose what information is included when copying the transcript.</div>
-          <label style="display:flex; align-items:center; gap:.5rem;">
-            <input type="checkbox" id="includeProtocolName" style="width:auto;"> Include protocol name
-          </label>
-          <label style="display:flex; align-items:center; gap:.5rem;">
-            <input type="checkbox" id="includeProtocolSummary" style="width:auto;"> Include protocol summary
-          </label>
-          <label style="display:flex; align-items:center; gap:.5rem;">
-            <input type="checkbox" id="includeQuestionText" style="width:auto;"> Include full questions
-          </label>
-          <label style="display:flex; align-items:center; gap:.5rem;">
-            <input type="checkbox" id="includeAnswerText" style="width:auto;"> Include answers
-          </label>
+        <div class="section">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap;">
+            <div>
+              <h3>Questions</h3>
+              <div class="hint">Per-question copy text replaces the old checkbox settings. Add links to related follow-ups.</div>
+            </div>
+            <div class="actions">
+              <button class="btn" id="newQuestion">New question</button>
+              <span class="pill" id="questionCount">0 questions</span>
+            </div>
+          </div>
+          <div class="question-list" id="questionList"></div>
         </div>
 
-        <div>
-          <h3 style="margin:0 0 .35rem;">Questions</h3>
-          <div class="sub" style="margin:0 0 .75rem;">Build your flow using prompts, optional details, and answers that point to the next question key.</div>
-          <div class="actions" style="margin-bottom:.65rem;">
-            <button class="btn" id="newQuestion">New question</button>
-            <span class="tag" id="questionCount"></span>
+        <div class="section" id="questionEditor">
+          <h3>Question builder</h3>
+          <div class="two-col">
+            <div class="field">
+              <label for="questionId">Question key</label>
+              <div class="inline">
+                <input id="questionId" placeholder="auto-populated">
+                <button class="btn" id="generateQuestionKey" type="button">Generate</button>
+              </div>
+              <div class="hint">Keys stay scoped to the selected protocol.</div>
+            </div>
+            <div class="field">
+              <label for="questionLinks">Linked questions</label>
+              <select id="questionLinks" multiple size="4"></select>
+              <div class="hint">Use to hint related jumps for the dispatcher.</div>
+            </div>
           </div>
-          <div class="list" id="questionList" style="max-height:320px;"></div>
-          <div style="margin-top:1rem;" class="stack">
-            <label for="questionId">Question key</label>
-            <input id="questionId" placeholder="card-10.entry">
-            <label for="questionPrompt">Prompt</label>
+
+          <div class="field">
+            <label for="questionPrompt">Question text</label>
             <textarea id="questionPrompt" placeholder="Tell me exactly what happened."></textarea>
+          </div>
+          <div class="field">
+            <label for="questionCopy">Text to copy for question</label>
+            <textarea id="questionCopy" placeholder="Copy-friendly wording for transcripts."></textarea>
+          </div>
+          <div class="field">
             <label for="questionDetail">Detail (optional)</label>
             <textarea id="questionDetail" placeholder="Clarify what the caller should provide."></textarea>
-            <div class="actions" style="margin-bottom:.35rem;">
-              <span class="tag">Answers</span>
+          </div>
+
+          <div class="section" style="border-style:dashed;">
+            <div class="inline" style="justify-content:space-between; align-items:center;">
+              <div>
+                <strong>Answers</strong>
+                <div class="hint">Provide label, copy text, and next question key. Aliases help search.</div>
+              </div>
               <button class="btn" id="addAnswer">Add answer</button>
             </div>
-            <div class="answers" id="answers"></div>
-            <div class="actions" style="margin:.35rem 0; align-items:center;">
-              <span class="tag">Free-text entry</span>
-              <label style="display:flex; align-items:center; gap:.35rem; color:var(--muted);">
+            <div id="answers"></div>
+          </div>
+
+          <div class="section" style="border-style:dashed;">
+            <div class="inline" style="justify-content:space-between; align-items:center;">
+              <div>
+                <strong>Free-text entry</strong>
+                <div class="hint">Allow typed responses in addition to the answer buttons.</div>
+              </div>
+              <label class="inline" style="color:var(--muted);">
                 <input type="checkbox" id="questionTextEnabled" style="width:auto;"> Enable typed response
               </label>
             </div>
-            <label for="questionTextLabel">Text field label</label>
-            <input id="questionTextLabel" placeholder="Describe cardiac history">
-            <label for="questionTextPlaceholder">Placeholder</label>
-            <input id="questionTextPlaceholder" placeholder="E.g., pacemaker, stents, meds">
-            <label for="questionTextNext">Next question key</label>
-            <input id="questionTextNext" placeholder="card-10.priority">
-            <label for="questionAction">Action (optional)</label>
-            <textarea id="questionAction" placeholder="Instructions given before responders arrive."></textarea>
-            <label for="questionOutcome">Outcome (optional)</label>
-            <textarea id="questionOutcome" placeholder="Dispatcher summary or dispatch priority."></textarea>
-            <div class="actions" style="margin-top:.65rem;">
-              <button class="btn primary" id="saveQuestion">Save question</button>
-              <button class="btn danger" id="deleteQuestion">Delete question</button>
+            <div class="two-col">
+              <div class="field">
+                <label for="questionTextLabel">Text field label</label>
+                <input id="questionTextLabel" placeholder="Describe cardiac history">
+              </div>
+              <div class="field">
+                <label for="questionTextPlaceholder">Placeholder</label>
+                <input id="questionTextPlaceholder" placeholder="E.g., pacemaker, stents, meds">
+              </div>
             </div>
+            <div class="field">
+              <label for="questionTextNext">Next question key</label>
+              <input id="questionTextNext" placeholder="card-10.priority">
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="field">
+              <label for="questionAction">Action (optional)</label>
+              <textarea id="questionAction" placeholder="Instructions given before responders arrive."></textarea>
+            </div>
+            <div class="field">
+              <label for="questionOutcome">Outcome (optional)</label>
+              <textarea id="questionOutcome" placeholder="Dispatcher summary or dispatch priority."></textarea>
+            </div>
+          </div>
+
+          <div class="actions" style="justify-content:flex-end;">
+            <button class="btn" id="discardQuestion">Clear</button>
+            <button class="btn primary" id="saveQuestion">Save question</button>
+            <button class="btn danger" id="deleteQuestion">Delete</button>
           </div>
         </div>
       </div>
@@ -166,16 +347,15 @@
 
   <script src="./data.js"></script>
   <script>
-    const { loadData, saveData, resetData, defaultCopySettings } = window.dataStore;
+    const { loadData, saveData, resetData, withCopyDefaults } = window.dataStore;
 
-    let { protocols, questions, copySettings } = loadData();
-    copySettings = copySettings || defaultCopySettings;
-    let selectedProtocol = null;
-    let selectedQuestion = null;
+    let { protocols, questions } = loadData();
+    let selectedProtocolId = null;
+    let selectedQuestionId = null;
+    let autoSyncProtocolId = false;
 
-    const protocolList = document.getElementById('protocolList');
-    const questionList = document.getElementById('questionList');
-    const questionCount = document.getElementById('questionCount');
+    const protocolSearch = document.getElementById('protocolSearch');
+    const protocolGrid = document.getElementById('protocolGrid');
 
     const protocolId = document.getElementById('protocolId');
     const protocolName = document.getElementById('protocolName');
@@ -183,9 +363,16 @@
     const protocolCategory = document.getElementById('protocolCategory');
     const protocolEntry = document.getElementById('protocolEntry');
 
+    const drawerTitle = document.getElementById('drawerTitle');
+    const drawerHint = document.getElementById('drawerHint');
+
+    const questionList = document.getElementById('questionList');
+    const questionCount = document.getElementById('questionCount');
     const questionId = document.getElementById('questionId');
     const questionPrompt = document.getElementById('questionPrompt');
+    const questionCopy = document.getElementById('questionCopy');
     const questionDetail = document.getElementById('questionDetail');
+    const questionLinks = document.getElementById('questionLinks');
     const questionTextEnabled = document.getElementById('questionTextEnabled');
     const questionTextLabel = document.getElementById('questionTextLabel');
     const questionTextPlaceholder = document.getElementById('questionTextPlaceholder');
@@ -194,107 +381,279 @@
     const questionOutcome = document.getElementById('questionOutcome');
     const answersEl = document.getElementById('answers');
 
-    const includeProtocolName = document.getElementById('includeProtocolName');
-    const includeProtocolSummary = document.getElementById('includeProtocolSummary');
-    const includeQuestionText = document.getElementById('includeQuestionText');
-    const includeAnswerText = document.getElementById('includeAnswerText');
-
-    const newProtocolBtn = document.getElementById('newProtocol');
     const saveProtocolBtn = document.getElementById('saveProtocol');
+    const saveProtocolSecondaryBtn = document.getElementById('saveProtocolSecondary');
     const deleteProtocolBtn = document.getElementById('deleteProtocol');
+    const newProtocolBtn = document.getElementById('newProtocol');
+    const regenerateCodeBtn = document.getElementById('regenerateCode');
+    const discardChangesBtn = document.getElementById('discardChanges');
+
     const newQuestionBtn = document.getElementById('newQuestion');
+    const generateQuestionKeyBtn = document.getElementById('generateQuestionKey');
     const addAnswerBtn = document.getElementById('addAnswer');
     const saveQuestionBtn = document.getElementById('saveQuestion');
     const deleteQuestionBtn = document.getElementById('deleteQuestion');
+    const discardQuestionBtn = document.getElementById('discardQuestion');
+
     const saveAllBtn = document.getElementById('saveAll');
     const loadDefaultsBtn = document.getElementById('loadDefaults');
 
-    function renderProtocols() {
-      protocolList.innerHTML = '';
-      protocols.forEach((p) => {
-        const div = document.createElement('div');
-        div.className = `item ${selectedProtocol?.id === p.id ? 'active' : ''}`;
-        div.innerHTML = `<strong>${p.id}</strong><div style="color:var(--muted); font-size:.9rem;">${p.name}</div>`;
-        div.onclick = () => selectProtocol(p.id);
-        protocolList.appendChild(div);
-      });
-      questionCount.textContent = `${Object.keys(questions).length} total questions`;
+    function slugify(value) {
+      return (value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '')
+        .replace(/-{2,}/g, '-');
     }
 
-    function renderQuestions() {
+    function ensureUniqueProtocolId(base, currentId = null) {
+      const safeBase = base || 'protocol';
+      let candidate = safeBase;
+      let counter = 2;
+      while (protocols.some((p) => p.id === candidate && p.id !== currentId)) {
+        candidate = `${safeBase}-${counter++}`;
+      }
+      return candidate;
+    }
+
+    function ensureQuestionKey(baseKey, currentKey = null) {
+      const scopedBase = `${selectedProtocolId || 'protocol'}.${baseKey || 'question'}`;
+      let candidate = scopedBase;
+      let counter = 2;
+      while (questions[candidate] && candidate !== currentKey) {
+        candidate = `${scopedBase}-${counter++}`;
+      }
+      return candidate;
+    }
+
+    function renderProtocols() {
+      protocolGrid.innerHTML = '';
+      const term = protocolSearch.value.trim().toLowerCase();
+      const filtered = protocols.filter((p) => {
+        if (!term) return true;
+        return p.id.toLowerCase().includes(term) || p.name.toLowerCase().includes(term);
+      });
+
+      const createCard = document.createElement('div');
+      createCard.className = 'protocol-card';
+      createCard.innerHTML = '<strong>➕ New protocol</strong><small>Start a blank card with an auto-generated short code.</small>';
+      createCard.onclick = startNewProtocol;
+      protocolGrid.appendChild(createCard);
+
+      filtered.forEach((p) => {
+        const card = document.createElement('div');
+        card.className = `protocol-card ${selectedProtocolId === p.id ? 'active' : ''}`;
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${p.name}</strong>
+            <span class="pill">${p.id}</span>
+          </div>
+          <small>${p.summary || 'No summary yet.'}</small>
+          <div class="pill" style="width:max-content;">${p.category || 'Uncategorized'}</div>
+        `;
+        card.onclick = () => selectProtocol(p.id);
+        protocolGrid.appendChild(card);
+      });
+    }
+
+    function renderQuestionList() {
       questionList.innerHTML = '';
-      const entries = Object.keys(questions).sort();
-      const scopedEntries = selectedProtocol
-        ? entries.filter((key) => key.startsWith(`${selectedProtocol.id}.`))
-        : entries;
-      scopedEntries.forEach((key) => {
+      if (!selectedProtocolId) {
+        questionList.innerHTML = '<div class="hint">Select or create a protocol first.</div>';
+        questionCount.textContent = '0 questions';
+        return;
+      }
+      const scoped = Object.keys(questions)
+        .filter((key) => key.startsWith(`${selectedProtocolId}.`))
+        .sort();
+      scoped.forEach((key) => {
+        const question = questions[key];
         const div = document.createElement('div');
-        div.className = `item ${selectedQuestion === key ? 'active' : ''}`;
-        div.innerHTML = `<strong>${key}</strong><div style="color:var(--muted); font-size:.9rem;">${questions[key].prompt}</div>`;
+        div.className = `question-item ${selectedQuestionId === key ? 'active' : ''}`;
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:.35rem; flex-wrap:wrap;">
+            <strong>${key}</strong>
+            <span class="pill">${(question.answers || []).length} answers</span>
+          </div>
+          <div class="hint">${question.prompt || 'No prompt yet.'}</div>
+        `;
         div.onclick = () => selectQuestion(key);
         questionList.appendChild(div);
       });
-      const meta = selectedProtocol ? `${scopedEntries.length} of ${entries.length}` : `${entries.length}`;
-      questionCount.textContent = `${meta} questions`;
+      questionCount.textContent = `${scoped.length} question${scoped.length === 1 ? '' : 's'}`;
+      renderLinkOptions(scoped);
+    }
+
+    function renderLinkOptions(scopedKeys = []) {
+      questionLinks.innerHTML = '';
+      scopedKeys.forEach((key) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        questionLinks.appendChild(option);
+      });
+    }
+
+    function renderAnswerRows(list) {
+      answersEl.innerHTML = '';
+      if (!list.length) {
+        const hint = document.createElement('div');
+        hint.className = 'hint';
+        hint.textContent = 'No answers yet. Add at least one or enable the free-text input.';
+        answersEl.appendChild(hint);
+        return;
+      }
+      list.forEach((answer) => addAnswerRow(answer.label, answer.next, answer.aliases, answer.copyText));
+    }
+
+    function addAnswerRow(label = '', next = '', aliases = [], copyText = '') {
+      const row = document.createElement('div');
+      row.className = 'answer-row';
+      row.innerHTML = `
+        <input placeholder="Answer label" value="${(label || '').replace(/"/g, '&quot;')}">
+        <input placeholder="Text to copy for answer" value="${(copyText || '').replace(/"/g, '&quot;')}">
+        <input placeholder="Next question key" value="${(next || '').replace(/"/g, '&quot;')}">
+        <input placeholder="Aliases (comma separated)" value="${(aliases || []).join(', ').replace(/"/g, '&quot;')}">
+        <button class="btn danger" aria-label="Remove answer">✕</button>
+      `;
+      row.querySelector('button').onclick = () => row.remove();
+      answersEl.appendChild(row);
     }
 
     function selectProtocol(id) {
       const protocol = protocols.find((p) => p.id === id);
       if (!protocol) return;
-      selectedProtocol = protocol;
-      selectedQuestion = null;
+      selectedProtocolId = protocol.id;
+      autoSyncProtocolId = false;
       protocolId.value = protocol.id;
-      protocolName.value = protocol.name;
+      protocolName.value = protocol.name || '';
       protocolSummary.value = protocol.summary || '';
       protocolCategory.value = protocol.category || '';
       protocolEntry.value = protocol.entry || '';
+      drawerTitle.textContent = `Editing ${protocol.name}`;
+      drawerHint.textContent = 'Save to keep the short code and entry key in sync.';
+      selectedQuestionId = null;
       renderProtocols();
-      renderQuestions();
+      renderQuestionList();
+      clearQuestionForm();
     }
 
-    function clearProtocolForm() {
-      selectedProtocol = null;
+    function startNewProtocol() {
+      selectedProtocolId = null;
+      selectedQuestionId = null;
+      autoSyncProtocolId = true;
+      protocolName.value = '';
+      const generatedId = ensureUniqueProtocolId('new-protocol');
+      protocolId.value = generatedId;
+      protocolSummary.value = '';
+      protocolCategory.value = '';
+      protocolEntry.value = `${generatedId}.entry`;
+      drawerTitle.textContent = 'Creating a new protocol';
+      drawerHint.textContent = 'Add a title and summary. The short code will auto-update as you type.';
+      renderProtocols();
+      renderQuestionList();
+      clearQuestionForm();
+    }
+
+    function regenerateProtocolId() {
+      autoSyncProtocolId = true;
+      syncProtocolId();
+    }
+
+    function syncProtocolId() {
+      if (!autoSyncProtocolId) return;
+      const base = slugify(protocolName.value || protocolId.value || 'protocol');
+      const unique = ensureUniqueProtocolId(base, selectedProtocolId);
+      protocolId.value = unique;
+      if (!protocolEntry.value) {
+        protocolEntry.value = `${unique}.entry`;
+      }
+    }
+
+    function saveProtocol() {
+      if (!protocolName.value.trim()) return alert('Protocol title is required.');
+      const trimmedName = protocolName.value.trim();
+      const newId = ensureUniqueProtocolId(protocolId.value.trim() || slugify(trimmedName), selectedProtocolId);
+      const payload = {
+        id: newId,
+        name: trimmedName,
+        summary: protocolSummary.value.trim(),
+        category: protocolCategory.value.trim(),
+        entry: (protocolEntry.value.trim() || `${newId}.entry`).replace(/\s+/g, '')
+      };
+
+      const existingIndex = protocols.findIndex((p) => p.id === selectedProtocolId || p.id === newId);
+      if (existingIndex >= 0) {
+        const previousId = protocols[existingIndex].id;
+        protocols[existingIndex] = payload;
+        if (previousId !== newId) {
+          const updated = {};
+          Object.keys(questions).forEach((key) => {
+            if (key.startsWith(`${previousId}.`)) {
+              const newKey = `${newId}${key.slice(previousId.length)}`;
+              const question = { ...questions[key] };
+              question.answers = (question.answers || []).map((answer) => ({
+                ...answer,
+                next: answer.next?.startsWith(`${previousId}.`)
+                  ? `${newId}${answer.next.slice(previousId.length)}`
+                  : answer.next
+              }));
+              if (question.textEntry?.next?.startsWith(`${previousId}.`)) {
+                question.textEntry = { ...question.textEntry, next: `${newId}${question.textEntry.next.slice(previousId.length)}` };
+              }
+              question.links = (question.links || []).map((link) =>
+                link.startsWith(`${previousId}.`) ? `${newId}${link.slice(previousId.length)}` : link
+              );
+              updated[newKey] = question;
+              if (selectedQuestionId === key) selectedQuestionId = newKey;
+            } else {
+              updated[key] = questions[key];
+            }
+          });
+          questions = updated;
+        }
+      } else {
+        protocols.push(payload);
+      }
+
+      selectedProtocolId = newId;
+      autoSyncProtocolId = false;
+      drawerTitle.textContent = `Editing ${payload.name}`;
+      renderProtocols();
+      renderQuestionList();
+      alert('Protocol saved.');
+    }
+
+    function deleteProtocol() {
+      if (!selectedProtocolId) return alert('Select a protocol first.');
+      if (!confirm('Delete this protocol and all its questions?')) return;
+      protocols = protocols.filter((p) => p.id !== selectedProtocolId);
+      const updated = {};
+      Object.keys(questions).forEach((key) => {
+        if (!key.startsWith(`${selectedProtocolId}.`)) updated[key] = questions[key];
+      });
+      questions = updated;
+      selectedProtocolId = null;
+      selectedQuestionId = null;
       protocolId.value = '';
       protocolName.value = '';
       protocolSummary.value = '';
       protocolCategory.value = '';
       protocolEntry.value = '';
+      drawerTitle.textContent = 'Select a protocol to edit';
+      drawerHint.textContent = 'Pick a card on the left or start a new one. Required fields are highlighted.';
       renderProtocols();
-      renderQuestions();
-    }
-
-    function saveProtocol() {
-      if (!protocolId.value.trim() || !protocolName.value.trim()) return alert('Protocol code and name are required.');
-      const existingIndex = protocols.findIndex((p) => p.id === protocolId.value.trim());
-      const payload = {
-        id: protocolId.value.trim(),
-        name: protocolName.value.trim(),
-        summary: protocolSummary.value.trim(),
-        category: protocolCategory.value.trim(),
-        entry: protocolEntry.value.trim(),
-      };
-      if (existingIndex >= 0) {
-        protocols[existingIndex] = payload;
-      } else {
-        protocols.push(payload);
-      }
-      selectedProtocol = payload;
-      renderProtocols();
-    }
-
-    function deleteProtocol() {
-      if (!selectedProtocol) return;
-      protocols = protocols.filter((p) => p.id !== selectedProtocol.id);
-      if (selectedQuestion && !questions[selectedQuestion]) selectedQuestion = null;
-      clearProtocolForm();
+      renderQuestionList();
+      clearQuestionForm();
     }
 
     function selectQuestion(id) {
       const question = questions[id];
       if (!question) return;
-      selectedQuestion = id;
+      selectedQuestionId = id;
       questionId.value = id;
       questionPrompt.value = question.prompt || '';
+      questionCopy.value = question.copyPrompt || question.prompt || '';
       questionDetail.value = question.detail || '';
       questionTextEnabled.checked = Boolean(question.textEntry);
       questionTextLabel.value = question.textEntry?.label || '';
@@ -303,13 +662,17 @@
       questionAction.value = question.action || '';
       questionOutcome.value = question.outcome || '';
       renderAnswerRows(question.answers || []);
-      renderQuestions();
+      Array.from(questionLinks.options).forEach((opt) => {
+        opt.selected = question.links?.includes(opt.value);
+      });
+      renderQuestionList();
     }
 
     function clearQuestionForm() {
-      selectedQuestion = null;
+      selectedQuestionId = null;
       questionId.value = '';
       questionPrompt.value = '';
+      questionCopy.value = '';
       questionDetail.value = '';
       questionTextEnabled.checked = false;
       questionTextLabel.value = '';
@@ -317,131 +680,127 @@
       questionTextNext.value = '';
       questionAction.value = '';
       questionOutcome.value = '';
+      Array.from(questionLinks.options).forEach((opt) => (opt.selected = false));
       renderAnswerRows([]);
-      renderQuestions();
-    }
-
-    function renderAnswerRows(list) {
-      answersEl.innerHTML = '';
-      if (!list.length) {
-        const hint = document.createElement('div');
-        hint.className = 'tag';
-        hint.textContent = 'No answers yet';
-        answersEl.appendChild(hint);
-        return;
-      }
-      list.forEach((answer, idx) => addAnswerRow(answer.label, answer.next, idx, answer.aliases));
-    }
-
-    function addAnswerRow(label = '', next = '', index = null, aliases = []) {
-      const row = document.createElement('div');
-      row.className = 'answer-row';
-      row.innerHTML = `
-        <input placeholder="Answer label" value="${label.replace(/"/g, '&quot;')}">
-        <input placeholder="Next question key" value="${next.replace(/"/g, '&quot;')}">
-        <input placeholder="Aliases (comma separated)" value="${(aliases || []).join(', ')}">
-        <button class="btn danger" aria-label="Remove answer">✕</button>
-      `;
-      const removeBtn = row.querySelector('button');
-      removeBtn.onclick = () => row.remove();
-      if (index !== null && answersEl.children[index]) {
-        answersEl.insertBefore(row, answersEl.children[index]);
-      } else {
-        answersEl.appendChild(row);
-      }
     }
 
     function collectAnswers() {
       return Array.from(answersEl.querySelectorAll('.answer-row')).map((row) => {
-        const [labelInput, nextInput, aliasInput] = row.querySelectorAll('input');
+        const [labelInput, copyInput, nextInput, aliasInput] = row.querySelectorAll('input');
         const aliases = aliasInput.value
           .split(',')
           .map((a) => a.trim())
           .filter(Boolean);
-        return { label: labelInput.value.trim(), next: nextInput.value.trim(), aliases };
+        return {
+          label: labelInput.value.trim(),
+          copyText: copyInput.value.trim() || labelInput.value.trim(),
+          next: nextInput.value.trim(),
+          aliases
+        };
       }).filter((a) => a.label && a.next);
     }
 
+    function generateQuestionKey() {
+      if (!selectedProtocolId) return alert('Select a protocol first.');
+      const base = slugify(questionPrompt.value) || 'question';
+      questionId.value = ensureQuestionKey(base, selectedQuestionId);
+    }
+
     function saveQuestion() {
-      if (!questionId.value.trim() || !questionPrompt.value.trim()) return alert('Question key and prompt are required.');
+      if (!selectedProtocolId) return alert('Save or select a protocol first.');
+      if (!questionPrompt.value.trim()) return alert('Question text is required.');
+      let key = questionId.value.trim();
+      if (!key) {
+        const base = slugify(questionPrompt.value) || 'question';
+        key = ensureQuestionKey(base);
+      }
+      if (!key.startsWith(`${selectedProtocolId}.`)) {
+        key = `${selectedProtocolId}.${key}`;
+      }
+
       const payload = {
         prompt: questionPrompt.value.trim(),
+        copyPrompt: questionCopy.value.trim() || questionPrompt.value.trim(),
         detail: questionDetail.value.trim(),
         answers: collectAnswers(),
+        links: Array.from(questionLinks.selectedOptions).map((o) => o.value)
       };
+
       if (questionTextEnabled.checked) {
         if (!questionTextNext.value.trim()) return alert('Next question key is required for text entry.');
         payload.textEntry = {
           label: questionTextLabel.value.trim(),
           placeholder: questionTextPlaceholder.value.trim(),
-          next: questionTextNext.value.trim(),
+          next: questionTextNext.value.trim()
         };
       }
       if (questionAction.value.trim()) payload.action = questionAction.value.trim();
       if (questionOutcome.value.trim()) payload.outcome = questionOutcome.value.trim();
-      questions[questionId.value.trim()] = payload;
-      selectedQuestion = questionId.value.trim();
-      renderQuestions();
+
+      if (selectedQuestionId && selectedQuestionId !== key) {
+        delete questions[selectedQuestionId];
+      }
+      questions[key] = payload;
+      selectedQuestionId = key;
+      renderQuestionList();
+      alert('Question saved.');
     }
 
     function deleteQuestion() {
-      if (!selectedQuestion) return;
-      delete questions[selectedQuestion];
+      if (!selectedQuestionId) return alert('Select a question first.');
+      if (!confirm('Delete this question?')) return;
+      delete questions[selectedQuestionId];
       clearQuestionForm();
+      renderQuestionList();
     }
 
     function saveAll() {
       saveProtocol();
-      saveQuestion();
-      saveData(protocols, questions, copySettings || defaultCopySettings);
+      saveData(protocols, questions);
       alert('Saved! Open the questionnaire page to see your updates.');
     }
 
     function loadDefaults() {
       const reset = resetData();
       protocols = reset.protocols;
-      questions = reset.questions;
-      copySettings = reset.copySettings;
-      clearProtocolForm();
-      clearQuestionForm();
+      questions = withCopyDefaults(reset.questions);
+      selectedProtocolId = null;
+      selectedQuestionId = null;
+      startNewProtocol();
       renderProtocols();
-      renderQuestions();
-      renderCopySettings();
+      renderQuestionList();
+      alert('Defaults loaded.');
     }
 
-    function renderCopySettings() {
-      includeProtocolName.checked = Boolean(copySettings?.includeProtocolName);
-      includeProtocolSummary.checked = Boolean(copySettings?.includeProtocolSummary);
-      includeQuestionText.checked = Boolean(copySettings?.includeQuestionText);
-      includeAnswerText.checked = Boolean(copySettings?.includeAnswerText);
-    }
+    protocolName.oninput = syncProtocolId;
+    regenerateCodeBtn.onclick = regenerateProtocolId;
+    protocolSearch.addEventListener('input', renderProtocols);
+    protocolSearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const term = protocolSearch.value.trim().toLowerCase();
+        const filtered = protocols.filter((p) => !term || p.id.toLowerCase().includes(term) || p.name.toLowerCase().includes(term));
+        if (filtered.length === 1) selectProtocol(filtered[0].id);
+      }
+    });
 
-    function updateCopySettings() {
-      copySettings = {
-        includeProtocolName: includeProtocolName.checked,
-        includeProtocolSummary: includeProtocolSummary.checked,
-        includeQuestionText: includeQuestionText.checked,
-        includeAnswerText: includeAnswerText.checked,
-      };
-    }
-
-    newProtocolBtn.onclick = clearProtocolForm;
     saveProtocolBtn.onclick = saveProtocol;
+    saveProtocolSecondaryBtn.onclick = saveProtocol;
     deleteProtocolBtn.onclick = deleteProtocol;
+    newProtocolBtn.onclick = startNewProtocol;
+    discardChangesBtn.onclick = startNewProtocol;
+
     newQuestionBtn.onclick = clearQuestionForm;
+    generateQuestionKeyBtn.onclick = generateQuestionKey;
     addAnswerBtn.onclick = () => addAnswerRow();
     saveQuestionBtn.onclick = saveQuestion;
     deleteQuestionBtn.onclick = deleteQuestion;
+    discardQuestionBtn.onclick = clearQuestionForm;
+
     saveAllBtn.onclick = saveAll;
     loadDefaultsBtn.onclick = loadDefaults;
-    includeProtocolName.onchange = updateCopySettings;
-    includeProtocolSummary.onchange = updateCopySettings;
-    includeQuestionText.onchange = updateCopySettings;
-    includeAnswerText.onchange = updateCopySettings;
 
     renderProtocols();
-    renderQuestions();
-    renderCopySettings();
+    renderQuestionList();
   </script>
 </body>
 </html>
