@@ -100,6 +100,11 @@ export const defaultQuestions = {
   'card-10.history': {
     prompt: 'Any cardiac history or implanted devices?',
     detail: 'Collect history for responders (stents, pacemaker, prior MI).',
+    textEntry: {
+      label: 'Describe cardiac history',
+      placeholder: 'E.g., prior MI, stents, pacemaker, meds',
+      next: 'card-10.priority'
+    },
     answers: [
       { label: 'History provided', next: 'card-10.priority' },
       { label: 'No history / unknown', next: 'card-10.priority' }

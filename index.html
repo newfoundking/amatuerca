@@ -305,7 +305,7 @@
 
       const meta = document.createElement('div');
       meta.className = 'meta';
-      meta.innerHTML = `<span class="pill">${state.protocolId}</span><span class="pill">${node.answers?.length || 0} options</span>`;
+      meta.innerHTML = `<span class="pill">${state.protocolId}</span><span class="pill">${node.answers?.length || 0} options</span>${node.textEntry ? '<span class="pill">Text entry</span>' : ''}`;
       questionCard.appendChild(meta);
 
       const options = document.createElement('div');
@@ -319,7 +319,42 @@
           btn.onclick = () => selectAnswer(answer);
           options.appendChild(btn);
         });
-      } else {
+      }
+
+      if (node.textEntry) {
+        const form = document.createElement('div');
+        form.className = 'option';
+        form.style.display = 'grid';
+        form.style.gap = '.35rem';
+
+        const label = document.createElement('label');
+        label.textContent = node.textEntry.label || 'Enter response';
+        label.style.fontWeight = '600';
+        label.style.marginBottom = '0';
+        form.appendChild(label);
+
+        const input = document.createElement('input');
+        input.placeholder = node.textEntry.placeholder || 'Type response here';
+        input.style.width = '100%';
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            submitTextEntry(node, input.value);
+          }
+        };
+        form.appendChild(input);
+
+        const submit = document.createElement('button');
+        submit.className = 'primary-btn';
+        submit.textContent = 'Submit';
+        submit.style.justifySelf = 'start';
+        submit.onclick = () => submitTextEntry(node, input.value);
+        form.appendChild(submit);
+
+        options.appendChild(form);
+      }
+
+      if (!node.answers?.length && !node.textEntry) {
         const none = document.createElement('p');
         none.className = 'hint';
         none.textContent = 'No selectable answers. See outcome below.';
@@ -353,6 +388,17 @@
       state.stack.push(state.currentQuestion);
       state.transcript.push({ question: questions[state.currentQuestion]?.prompt ?? '', answer: answer.label });
       state.currentQuestion = answer.next;
+      renderQuestion();
+      renderTranscript();
+    }
+
+    function submitTextEntry(node, value) {
+      const trimmed = value.trim();
+      if (!trimmed) return alert('Please enter a response before continuing.');
+      if (!node.textEntry?.next) return alert('Next question is not configured for this text entry.');
+      state.stack.push(state.currentQuestion);
+      state.transcript.push({ question: node.prompt ?? '', answer: trimmed });
+      state.currentQuestion = node.textEntry.next;
       renderQuestion();
       renderTranscript();
     }
