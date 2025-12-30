@@ -380,42 +380,54 @@
     }
   };
 
+  const defaultCopySettings = {
+    includeProtocolName: true,
+    includeProtocolSummary: true,
+    includeQuestionText: true,
+    includeAnswerText: true
+  };
+
   function cloneDefaults() {
     return {
       protocols: JSON.parse(JSON.stringify(defaultProtocols)),
-      questions: JSON.parse(JSON.stringify(defaultQuestions))
+      questions: JSON.parse(JSON.stringify(defaultQuestions)),
+      copySettings: JSON.parse(JSON.stringify(defaultCopySettings))
     };
   }
 
   function loadData() {
-    const { protocols, questions } = cloneDefaults();
+    const { protocols, questions, copySettings } = cloneDefaults();
     try {
       const storedProtocols = localStorage.getItem('protocols');
       const storedQuestions = localStorage.getItem('questions');
+      const storedCopySettings = localStorage.getItem('copySettings');
       return {
         protocols: storedProtocols ? JSON.parse(storedProtocols) : protocols,
-        questions: storedQuestions ? JSON.parse(storedQuestions) : questions
+        questions: storedQuestions ? JSON.parse(storedQuestions) : questions,
+        copySettings: storedCopySettings ? JSON.parse(storedCopySettings) : copySettings
       };
     } catch (err) {
       console.warn('Failed to parse stored data, using defaults', err);
-      return { protocols, questions };
+      return { protocols, questions, copySettings };
     }
   }
 
-  function saveData(protocols, questions) {
+  function saveData(protocols, questions, copySettings = defaultCopySettings) {
     localStorage.setItem('protocols', JSON.stringify(protocols));
     localStorage.setItem('questions', JSON.stringify(questions));
+    localStorage.setItem('copySettings', JSON.stringify(copySettings));
   }
 
   function resetData() {
-    const { protocols, questions } = cloneDefaults();
-    saveData(protocols, questions);
-    return { protocols, questions };
+    const { protocols, questions, copySettings } = cloneDefaults();
+    saveData(protocols, questions, copySettings);
+    return { protocols, questions, copySettings };
   }
 
   window.dataStore = {
     defaultProtocols,
     defaultQuestions,
+    defaultCopySettings,
     cloneDefaults,
     loadData,
     saveData,

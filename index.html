@@ -223,9 +223,10 @@
 
   <script src="./data.js"></script>
   <script>
-    const { loadData } = window.dataStore;
+    const { loadData, defaultCopySettings } = window.dataStore;
 
-    let { protocols, questions } = loadData();
+    let { protocols, questions, copySettings } = loadData();
+    copySettings = copySettings || defaultCopySettings;
 
     let state = {
       protocolId: null,
@@ -454,18 +455,34 @@
       const effectiveStart = Math.max(0, startIndex || 0);
       const transcriptSlice = state.transcript.slice(effectiveStart);
       const isPartial = effectiveStart > 0;
+      const settings = copySettings || defaultCopySettings;
       const lines = [];
-      lines.push(`Protocol: ${protocol?.name ?? state.protocolId ?? 'Not selected'}`);
-      if (protocol?.summary) lines.push(`Summary: ${protocol.summary}`);
-      lines.push('---');
+
+      const includeHeader = settings.includeProtocolName || settings.includeProtocolSummary;
+      if (settings.includeProtocolName) lines.push(`Protocol: ${protocol?.name ?? state.protocolId ?? 'Not selected'}`);
+      if (settings.includeProtocolSummary && protocol?.summary) lines.push(`Summary: ${protocol.summary}`);
+      if (includeHeader) lines.push('---');
+
+      if (!settings.includeQuestionText && !settings.includeAnswerText) {
+        lines.push('Transcript copy is disabled. Enable questions or answers in admin settings.');
+        return lines.join('\n');
+      }
+
       if (!transcriptSlice.length) {
         lines.push(isPartial ? 'No new Q&A captured since last copy.' : 'No Q&A captured yet.');
       }
+
       transcriptSlice.forEach((entry, idx) => {
         const number = effectiveStart + idx + 1;
-        lines.push(`${number}. Q: ${entry.question}`);
-        lines.push(`   A: ${entry.answer}`);
+        if (settings.includeQuestionText) {
+          lines.push(`${number}. Q: ${entry.question}`);
+        }
+        if (settings.includeAnswerText) {
+          const prefix = settings.includeQuestionText ? '   A:' : `${number}. A:`;
+          lines.push(`${prefix} ${entry.answer}`);
+        }
       });
+
       const node = questions[state.currentQuestion];
       if (node?.action) lines.push('', `Action: ${node.action}`);
       if (node?.outcome) lines.push('', `Outcome: ${node.outcome}`);
@@ -503,6 +520,7 @@
       const loaded = loadData();
       protocols = loaded.protocols;
       questions = loaded.questions;
+      copySettings = loaded.copySettings || defaultCopySettings;
       reset();
     }
 
