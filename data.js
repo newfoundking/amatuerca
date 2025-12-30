@@ -37,7 +37,7 @@
     }
   ];
 
-  const defaultQuestions = {
+  const baseQuestions = {
     'card-10.entry': {
       prompt: 'Tell me exactly what happened.',
       detail: 'Capture chief complaint to confirm chest pain and screen for trauma.',
@@ -380,54 +380,64 @@
     }
   };
 
-  const defaultCopySettings = {
-    includeProtocolName: true,
-    includeProtocolSummary: true,
-    includeQuestionText: true,
-    includeAnswerText: true
-  };
+  function withCopyDefaults(rawQuestions = {}) {
+    const hydrated = {};
+    Object.entries(rawQuestions).forEach(([id, question]) => {
+      const copy = { ...question };
+      copy.copyPrompt = question.copyPrompt || question.prompt || '';
+      copy.links = Array.isArray(question.links) ? question.links : [];
+      if (question.textEntry) {
+        copy.textEntry = { ...question.textEntry };
+      }
+      copy.answers = (question.answers || []).map((answer) => ({
+        ...answer,
+        aliases: Array.isArray(answer.aliases) ? answer.aliases : [],
+        copyText: answer.copyText || answer.label || ''
+      }));
+      hydrated[id] = copy;
+    });
+    return hydrated;
+  }
+
+  const defaultQuestions = withCopyDefaults(baseQuestions);
 
   function cloneDefaults() {
     return {
       protocols: JSON.parse(JSON.stringify(defaultProtocols)),
-      questions: JSON.parse(JSON.stringify(defaultQuestions)),
-      copySettings: JSON.parse(JSON.stringify(defaultCopySettings))
+      questions: JSON.parse(JSON.stringify(defaultQuestions))
     };
   }
 
   function loadData() {
-    const { protocols, questions, copySettings } = cloneDefaults();
+    const { protocols, questions } = cloneDefaults();
     try {
       const storedProtocols = localStorage.getItem('protocols');
       const storedQuestions = localStorage.getItem('questions');
-      const storedCopySettings = localStorage.getItem('copySettings');
       return {
         protocols: storedProtocols ? JSON.parse(storedProtocols) : protocols,
-        questions: storedQuestions ? JSON.parse(storedQuestions) : questions,
-        copySettings: storedCopySettings ? JSON.parse(storedCopySettings) : copySettings
+        questions: storedQuestions ? withCopyDefaults(JSON.parse(storedQuestions)) : questions
       };
     } catch (err) {
       console.warn('Failed to parse stored data, using defaults', err);
-      return { protocols, questions, copySettings };
+      return { protocols, questions };
     }
   }
 
-  function saveData(protocols, questions, copySettings = defaultCopySettings) {
+  function saveData(protocols, questions) {
     localStorage.setItem('protocols', JSON.stringify(protocols));
     localStorage.setItem('questions', JSON.stringify(questions));
-    localStorage.setItem('copySettings', JSON.stringify(copySettings));
   }
 
   function resetData() {
-    const { protocols, questions, copySettings } = cloneDefaults();
-    saveData(protocols, questions, copySettings);
-    return { protocols, questions, copySettings };
+    const { protocols, questions } = cloneDefaults();
+    saveData(protocols, questions);
+    return { protocols, questions };
   }
 
   window.dataStore = {
     defaultProtocols,
     defaultQuestions,
-    defaultCopySettings,
+    withCopyDefaults,
     cloneDefaults,
     loadData,
     saveData,
