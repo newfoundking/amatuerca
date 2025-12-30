@@ -80,6 +80,10 @@
     .panel h2 { margin-top: 0; margin-bottom: .25rem; font-size: 1.05rem; letter-spacing: -0.01em; }
     .panel p { color: var(--muted); margin-top: 0; margin-bottom: 1rem; font-size: .95rem; }
 
+    .search-box { display:flex; gap:.5rem; align-items:center; margin-bottom:.75rem; }
+    .search-box input { width:100%; padding:.65rem .75rem; border-radius:12px; border:1px solid var(--border); background:rgba(255,255,255,0.04); color:var(--text); font-family:inherit; }
+    .search-box kbd { background: rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:8px; padding:.2rem .45rem; font-size:.8rem; color:var(--muted); }
+
     .protocol-list { display: flex; flex-direction: column; gap: .75rem; }
 
     .protocol {
@@ -237,6 +241,15 @@
     };
 
     const protocolList = document.getElementById('protocolList');
+    const searchInput = document.createElement('input');
+    const searchBox = document.createElement('div');
+    searchBox.className = 'search-box';
+    searchInput.type = 'search';
+    searchInput.placeholder = 'Search or type code (Ctrl+\\)';
+    const hotkeyHint = document.createElement('kbd');
+    hotkeyHint.textContent = 'Ctrl+\\';
+    searchBox.append(searchInput, hotkeyHint);
+    protocolList.parentElement.insertBefore(searchBox, protocolList);
     const questionCard = document.getElementById('questionCard');
     const transcriptEl = document.getElementById('transcript');
     const codeInput = document.getElementById('codeInput');
@@ -246,7 +259,16 @@
 
     function renderProtocols() {
       protocolList.innerHTML = '';
-      protocols.forEach((p) => {
+      const term = searchInput.value.trim().toLowerCase();
+      const filtered = term
+        ? protocols.filter((p) =>
+            p.id.toLowerCase().includes(term) ||
+            p.name.toLowerCase().includes(term) ||
+            (p.code && p.code.toLowerCase().includes(term))
+          )
+        : protocols;
+
+      filtered.forEach((p) => {
         const div = document.createElement('div');
         div.className = `protocol ${state.protocolId === p.id ? 'active' : ''}`;
         div.innerHTML = `<strong>${p.name}</strong><small>${p.summary}</small>`;
@@ -326,6 +348,23 @@
         });
       }
 
+      if (node.answers?.length) {
+        const quickInput = document.createElement('input');
+        quickInput.placeholder = 'Type answer keyword or code, then Enter';
+        quickInput.style.padding = '.9rem 1rem';
+        quickInput.style.borderRadius = '12px';
+        quickInput.style.border = '1px solid var(--border)';
+        quickInput.style.background = 'rgba(255,255,255,0.04)';
+        quickInput.style.color = 'var(--text)';
+        quickInput.onkeyup = (e) => {
+          if (e.key === 'Enter') {
+            trySelectByInput(node, quickInput.value);
+          }
+        };
+        quickInput.oninput = () => highlightMatches(node, quickInput.value);
+        options.appendChild(quickInput);
+      }
+
       if (node.textEntry) {
         const form = document.createElement('div');
         form.className = 'option';
@@ -386,6 +425,39 @@
         outcome.className = 'outcome';
         outcome.innerHTML = `<strong>Final Steps</strong><div>${[node.action, node.outcome].filter(Boolean).join(' ')}</div>`;
         questionCard.appendChild(outcome);
+      }
+    }
+
+    function highlightMatches(node, rawValue) {
+      const term = rawValue.trim().toLowerCase();
+      const buttons = questionCard.querySelectorAll('button.option');
+      if (!term) {
+        buttons.forEach((btn) => (btn.style.borderColor = 'var(--border)'));
+        return;
+      }
+      node.answers?.forEach((answer, idx) => {
+        const matchesLabel = answer.label.toLowerCase().includes(term);
+        const matchesAlias = (answer.aliases || []).some((alias) => alias.toLowerCase().includes(term));
+        buttons[idx].style.borderColor = matchesLabel || matchesAlias ? 'var(--accent)' : 'var(--border)';
+      });
+    }
+
+    function trySelectByInput(node, rawValue) {
+      const term = rawValue.trim().toLowerCase();
+      if (!term) return;
+      const matches = (node.answers || []).filter((answer) => {
+        const labelMatch = answer.label.toLowerCase().includes(term);
+        const aliasMatch = (answer.aliases || []).some((alias) => alias.toLowerCase().includes(term));
+        return labelMatch || aliasMatch;
+      });
+      if (matches.length === 1) {
+        selectAnswer(matches[0]);
+      } else if (matches.length > 1) {
+        alert(`Multiple matches found: ${matches.map((m) => m.label).join(', ')}. Type more to narrow.`);
+      } else if (node.textEntry) {
+        submitTextEntry(node, rawValue);
+      } else {
+        alert('No matching option found for that entry.');
       }
     }
 
@@ -525,6 +597,24 @@
     }
 
     codeInput.addEventListener('input', (e) => startProtocolByCode(e.target.value));
+    searchInput.addEventListener('input', renderProtocols);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const filtered = protocols.filter((p) => {
+          const term = searchInput.value.trim().toLowerCase();
+          if (!term) return true;
+          return p.id.toLowerCase().includes(term) || p.name.toLowerCase().includes(term);
+        });
+        if (filtered.length === 1) startProtocol(filtered[0].id);
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === '\\') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
     copyButton.addEventListener('click', copyTranscriptToClipboard);
     copyNewButton.addEventListener('click', copyNewTranscriptToClipboard);
     window.addEventListener('storage', refreshFromStorage);
