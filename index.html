@@ -194,6 +194,7 @@
         <datalist id="protocolCodes"></datalist>
       </div>
       <button class="ghost-btn" id="copyTranscript">Copy transcript</button>
+      <button class="ghost-btn" id="copyNewTranscript">Copy new since last copy</button>
       <a class="primary-btn" href="admin.html" style="display:inline-flex; align-items:center; gap:.35rem; text-decoration:none;">Admin</a>
     </div>
   </header>
@@ -229,7 +230,8 @@
       protocolId: null,
       currentQuestion: null,
       stack: [],
-      transcript: []
+      transcript: [],
+      lastCopiedIndex: 0
     };
 
     const protocolList = document.getElementById('protocolList');
@@ -238,6 +240,7 @@
     const codeInput = document.getElementById('codeInput');
     const protocolCodes = document.getElementById('protocolCodes');
     const copyButton = document.getElementById('copyTranscript');
+    const copyNewButton = document.getElementById('copyNewTranscript');
 
     function renderProtocols() {
       protocolList.innerHTML = '';
@@ -264,7 +267,7 @@
     function startProtocol(id) {
       const protocol = protocols.find((p) => p.id === id);
       if (!protocol) return;
-      state = { protocolId: id, currentQuestion: protocol.entry, stack: [], transcript: [] };
+      state = { protocolId: id, currentQuestion: protocol.entry, stack: [], transcript: [], lastCopiedIndex: 0 };
       renderProtocols();
       renderQuestion();
       renderTranscript();
@@ -413,7 +416,7 @@
     }
 
     function reset() {
-      state = { protocolId: null, currentQuestion: null, stack: [], transcript: [] };
+      state = { protocolId: null, currentQuestion: null, stack: [], transcript: [], lastCopiedIndex: 0 };
       renderProtocols();
       renderQuestion();
       renderTranscript();
@@ -445,17 +448,21 @@
       }
     }
 
-    function buildTranscriptText() {
+    function buildTranscriptText(startIndex = 0) {
       const protocol = protocols.find((p) => p.id === state.protocolId);
+      const effectiveStart = Math.max(0, startIndex || 0);
+      const transcriptSlice = state.transcript.slice(effectiveStart);
+      const isPartial = effectiveStart > 0;
       const lines = [];
       lines.push(`Protocol: ${protocol?.name ?? state.protocolId ?? 'Not selected'}`);
       if (protocol?.summary) lines.push(`Summary: ${protocol.summary}`);
       lines.push('---');
-      if (!state.transcript.length) {
-        lines.push('No Q&A captured yet.');
+      if (!transcriptSlice.length) {
+        lines.push(isPartial ? 'No new Q&A captured since last copy.' : 'No Q&A captured yet.');
       }
-      state.transcript.forEach((entry, idx) => {
-        lines.push(`${idx + 1}. Q: ${entry.question}`);
+      transcriptSlice.forEach((entry, idx) => {
+        const number = effectiveStart + idx + 1;
+        lines.push(`${number}. Q: ${entry.question}`);
         lines.push(`   A: ${entry.answer}`);
       });
       const node = questions[state.currentQuestion];
@@ -464,16 +471,30 @@
       return lines.join('\n');
     }
 
-    function copyTranscriptToClipboard() {
-      const text = buildTranscriptText();
+    function copyTextToClipboard(text, buttonEl, onSuccess) {
       if (!navigator.clipboard) {
         alert(text);
         return;
       }
       navigator.clipboard.writeText(text).then(() => {
-        const original = copyButton.textContent;
-        copyButton.textContent = 'Copied!';
-        setTimeout(() => (copyButton.textContent = original), 1200);
+        const original = buttonEl.textContent;
+        buttonEl.textContent = 'Copied!';
+        setTimeout(() => (buttonEl.textContent = original), 1200);
+        onSuccess?.();
+      });
+    }
+
+    function copyTranscriptToClipboard() {
+      const text = buildTranscriptText();
+      copyTextToClipboard(text, copyButton, () => {
+        state.lastCopiedIndex = state.transcript.length;
+      });
+    }
+
+    function copyNewTranscriptToClipboard() {
+      const text = buildTranscriptText(state.lastCopiedIndex);
+      copyTextToClipboard(text, copyNewButton, () => {
+        state.lastCopiedIndex = state.transcript.length;
       });
     }
 
@@ -486,6 +507,7 @@
 
     codeInput.addEventListener('input', (e) => startProtocolByCode(e.target.value));
     copyButton.addEventListener('click', copyTranscriptToClipboard);
+    copyNewButton.addEventListener('click', copyNewTranscriptToClipboard);
     window.addEventListener('storage', refreshFromStorage);
 
     renderProtocols();
