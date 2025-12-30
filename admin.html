@@ -570,6 +570,11 @@
       }
     }
 
+    function persistData(message) {
+      saveData(protocols, questions);
+      if (message) alert(message);
+    }
+
     function saveProtocol() {
       if (!protocolName.value.trim()) return alert('Protocol title is required.');
       const trimmedName = protocolName.value.trim();
@@ -621,7 +626,7 @@
       drawerTitle.textContent = `Editing ${payload.name}`;
       renderProtocols();
       renderQuestionList();
-      alert('Protocol saved.');
+      persistData('Protocol saved.');
     }
 
     function deleteProtocol() {
@@ -645,6 +650,7 @@
       renderProtocols();
       renderQuestionList();
       clearQuestionForm();
+      persistData('Protocol deleted.');
     }
 
     function selectQuestion(id) {
@@ -743,7 +749,7 @@
       questions[key] = payload;
       selectedQuestionId = key;
       renderQuestionList();
-      alert('Question saved.');
+      persistData('Question saved.');
     }
 
     function deleteQuestion() {
@@ -752,12 +758,12 @@
       delete questions[selectedQuestionId];
       clearQuestionForm();
       renderQuestionList();
+      persistData('Question deleted.');
     }
 
     function saveAll() {
       saveProtocol();
-      saveData(protocols, questions);
-      alert('Saved! Open the questionnaire page to see your updates.');
+      persistData('Saved! Open the questionnaire page to see your updates.');
     }
 
     function loadDefaults() {
