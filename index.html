@@ -30,6 +30,9 @@
       padding: 0 1rem 2rem;
     }
 
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
     header {
       max-width: 1200px;
       margin: 0 auto;
@@ -40,11 +43,7 @@
       gap: 1rem;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 2rem;
-      letter-spacing: -0.01em;
-    }
+    h1 { margin: 0; font-size: 2rem; letter-spacing: -0.01em; }
 
     .badge {
       display: inline-flex;
@@ -78,25 +77,10 @@
       backdrop-filter: blur(6px);
     }
 
-    .panel h2 {
-      margin-top: 0;
-      margin-bottom: .25rem;
-      font-size: 1.05rem;
-      letter-spacing: -0.01em;
-    }
+    .panel h2 { margin-top: 0; margin-bottom: .25rem; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .panel p { color: var(--muted); margin-top: 0; margin-bottom: 1rem; font-size: .95rem; }
 
-    .panel p {
-      color: var(--muted);
-      margin-top: 0;
-      margin-bottom: 1rem;
-      font-size: .95rem;
-    }
-
-    .protocol-list {
-      display: flex;
-      flex-direction: column;
-      gap: .75rem;
-    }
+    .protocol-list { display: flex; flex-direction: column; gap: .75rem; }
 
     .protocol {
       border: 1px solid var(--border);
@@ -121,17 +105,9 @@
       gap: 1rem;
     }
 
-    .question-title {
-      margin: 0;
-      font-size: 1.25rem;
-      letter-spacing: -0.015em;
-    }
+    .question-title { margin: 0; font-size: 1.25rem; letter-spacing: -0.015em; }
 
-    .meta {
-      display: flex;
-      gap: .5rem;
-      flex-wrap: wrap;
-    }
+    .meta { display: flex; gap: .5rem; flex-wrap: wrap; }
 
     .pill {
       border-radius: 999px;
@@ -142,10 +118,7 @@
       font-size: .85rem;
     }
 
-    .options {
-      display: grid;
-      gap: .75rem;
-    }
+    .options { display: grid; gap: .75rem; }
 
     button.option {
       width: 100%;
@@ -181,13 +154,7 @@
 
     .primary-btn { background: linear-gradient(120deg, var(--accent), var(--accent-2)); border: none; color: #0b1224; }
 
-    .transcript {
-      display: grid;
-      gap: .75rem;
-      max-height: 480px;
-      overflow: auto;
-      padding-right: .25rem;
-    }
+    .transcript { display: grid; gap: .75rem; max-height: 480px; overflow: auto; padding-right: .25rem; }
 
     .entry {
       border-radius: 12px;
@@ -227,7 +194,7 @@
         <datalist id="protocolCodes"></datalist>
       </div>
       <button class="ghost-btn" id="copyTranscript">Copy transcript</button>
-      <button class="primary-btn" id="toggleAdmin">Admin</button>
+      <a class="primary-btn" href="admin.html" style="display:inline-flex; align-items:center; gap:.35rem; text-decoration:none;">Admin</a>
     </div>
   </header>
 
@@ -236,21 +203,7 @@
       <h2>Protocols</h2>
       <p>Select the appropriate entry based on caller statement.</p>
       <div class="protocol-list" id="protocolList"></div>
-      <div id="adminPanel" style="margin-top:1.25rem; display:none;">
-        <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem;">
-          <h3 style="margin:0;">Admin Backstage</h3>
-          <span class="pill">Edit protocols & flows</span>
-        </div>
-        <p class="hint" style="margin-top:0;">Update protocol list or question flows. Paste JSON and save to instantly refresh.</p>
-        <label style="display:block; font-weight:600; margin-bottom:.25rem;">Protocols</label>
-        <textarea id="protocolEditor" style="width:100%; min-height:160px; background: rgba(255,255,255,0.04); color: var(--text); border:1px solid var(--border); border-radius:12px; padding:.75rem; font-family: 'Inter', monospace;"></textarea>
-        <label style="display:block; font-weight:600; margin: .75rem 0 .25rem;">Questions</label>
-        <textarea id="questionEditor" style="width:100%; min-height:200px; background: rgba(255,255,255,0.04); color: var(--text); border:1px solid var(--border); border-radius:12px; padding:.75rem; font-family: 'Inter', monospace;"></textarea>
-        <div class="actions" style="margin-top:.75rem;">
-          <button class="primary-btn" id="saveAdmin">Save</button>
-          <button class="ghost-btn" id="loadDefaults">Load defaults</button>
-        </div>
-      </div>
+      <p class="hint" style="margin-top:1rem;">Need to adjust protocols? Visit the <a href="admin.html">admin workspace</a> to manage flows.</p>
     </aside>
 
     <section class="panel" aria-live="polite">
@@ -267,204 +220,10 @@
     </section>
   </div>
 
-  <script>
-    const defaultProtocols = [
-      {
-        id: 'card-10',
-        name: 'Card 10: Chest Pain (Non-Traumatic)',
-        summary: 'Investigate cardiac red flags, aspirin, and transport priority.',
-        entry: 'card-10.entry',
-        category: 'Medical'
-      },
-      {
-        id: 'card-69',
-        name: 'Card 69: Structure Fire',
-        summary: 'Size-up smoke, entrapment, and hazards prior to dispatch.',
-        entry: 'card-69.entry',
-        category: 'Fire'
-      }
-    ];
+  <script type="module">
+    import { loadData } from './data.js';
 
-    const defaultQuestions = {
-      'card-10.entry': {
-        prompt: 'Tell me exactly what happened.',
-        detail: 'Capture chief complaint to confirm chest pain and screen for trauma.',
-        answers: [
-          { label: 'Adult with chest tightness, no injury', next: 'card-10.abcs' },
-          { label: 'Chest pain after fall or trauma', next: 'card-10.trauma' },
-          { label: 'Unconscious or not breathing effectively', next: 'card-10.cpr' }
-        ]
-      },
-      'card-10.abcs': {
-        prompt: 'Is the patient breathing normally?',
-        detail: 'Check for effective respirations to rule out respiratory arrest.',
-        answers: [
-          { label: 'Yes, breathing normally', next: 'card-10.color' },
-          { label: 'No / barely breathing', next: 'card-10.cpr' }
-        ],
-        action: 'If breathing is abnormal, prepare to coach assisted ventilations or CPR.'
-      },
-      'card-10.color': {
-        prompt: 'Is the patient awake and able to speak?',
-        detail: 'Assess perfusion and mental status for priority symptoms.',
-        answers: [
-          { label: 'Awake and speaking', next: 'card-10.onset' },
-          { label: 'Faint / difficult to wake', next: 'card-10.priority' }
-        ]
-      },
-      'card-10.onset': {
-        prompt: 'When did the pain start and is it getting worse?',
-        detail: 'Establish onset for potential STEMI and transport decisions.',
-        answers: [
-          { label: 'Sudden onset within 2 hours', next: 'card-10.aspirin' },
-          { label: 'Gradual or intermittent', next: 'card-10.aspirin' }
-        ]
-      },
-      'card-10.aspirin': {
-        prompt: 'Has the patient taken aspirin today?',
-        detail: 'Follow agency protocol for aspirin administration if allowed.',
-        answers: [
-          { label: 'No or unknown', next: 'card-10.give-aspirin' },
-          { label: 'Yes, already took', next: 'card-10.nitro' }
-        ]
-      },
-      'card-10.give-aspirin': {
-        prompt: 'Is the patient allergic to aspirin or under 16 years old?',
-        detail: 'Contraindications for aspirin administration.',
-        answers: [
-          { label: 'No allergy and age 16+', next: 'card-10.nitro' },
-          { label: 'Allergy / under 16 / unsure', next: 'card-10.nitro' }
-        ],
-        action: 'If agency approved, have patient chew 325mg aspirin unless contraindicated.'
-      },
-      'card-10.nitro': {
-        prompt: 'Does the patient have prescribed nitroglycerin?',
-        detail: 'Check for self-administered meds and contraindications.',
-        answers: [
-          { label: 'Yes, and blood pressure adequate', next: 'card-10.history' },
-          { label: 'No or low blood pressure/dizziness', next: 'card-10.history' }
-        ],
-        action: 'Advise to follow prescribing guidance, seated position, and wait for responders.'
-      },
-      'card-10.history': {
-        prompt: 'Any cardiac history or implanted devices?',
-        detail: 'Collect history for responders (stents, pacemaker, prior MI).',
-        answers: [
-          { label: 'History provided', next: 'card-10.priority' },
-          { label: 'No history / unknown', next: 'card-10.priority' }
-        ],
-        action: 'Reassure caller, keep patient calm, limit exertion, and prepare for transport.'
-      },
-      'card-10.priority': {
-        prompt: 'Dispatch priority',
-        answers: [],
-        outcome: 'Send closest ALS. Monitor airway and prepare for CPR instructions if condition worsens.'
-      },
-      'card-10.cpr': {
-        prompt: 'Begin CPR instructions immediately',
-        answers: [],
-        outcome: 'Start compressions, 100-120/min. Continue until responders take over.'
-      },
-      'card-10.trauma': {
-        prompt: 'Redirect to trauma protocol',
-        answers: [],
-        outcome: 'Switch to appropriate trauma card and request additional resources.'
-      },
-
-      'card-69.entry': {
-        prompt: 'What exactly is burning?',
-        detail: 'Determine structure type and hazards.',
-        answers: [
-          { label: 'House or apartment', next: 'card-69.occupancy' },
-          { label: 'Commercial / industrial', next: 'card-69.hazmat' },
-          { label: 'Vegetation / wildland', next: 'card-69.wildland' }
-        ]
-      },
-      'card-69.occupancy': {
-        prompt: 'Is anyone trapped or unable to evacuate?',
-        detail: 'Identify entrapment for rescue assignment.',
-        answers: [
-          { label: 'Yes, people trapped', next: 'card-69.rescue' },
-          { label: 'No, everyone outside', next: 'card-69.exposures' },
-          { label: 'Unknown', next: 'card-69.exposures' }
-        ]
-      },
-      'card-69.rescue': {
-        prompt: 'Number of people trapped and location?',
-        detail: 'Gather critical information for first-arriving companies.',
-        answers: [
-          { label: 'Provide details', next: 'card-69.smoke' },
-          { label: 'Information unavailable', next: 'card-69.smoke' }
-        ],
-        action: 'Advise occupants to close doors, stay low, and await rescue if trapped.'
-      },
-      'card-69.smoke': {
-        prompt: 'What color and amount of smoke?',
-        detail: 'Dark pressurized smoke indicates advanced fire conditions.',
-        answers: [
-          { label: 'Heavy dark smoke', next: 'card-69.exposures' },
-          { label: 'Light or white smoke', next: 'card-69.exposures' }
-        ]
-      },
-      'card-69.exposures': {
-        prompt: 'Any hazards like gas leaks, weapons, or downed wires?',
-        detail: 'Safety concerns that change staging distance and PPE.',
-        answers: [
-          { label: 'Hazards present', next: 'card-69.water' },
-          { label: 'No hazards reported', next: 'card-69.water' }
-        ]
-      },
-      'card-69.water': {
-        prompt: 'Is there a hydrant or water supply nearby?',
-        detail: 'Supports water-on-wheels vs hydrant operations.',
-        answers: [
-          { label: 'Hydrant located', next: 'card-69.priority' },
-          { label: 'No hydrant / unsure', next: 'card-69.priority' }
-        ]
-      },
-      'card-69.hazmat': {
-        prompt: 'Is this a known chemical or hazmat facility?',
-        detail: 'Flags for hazmat response level and isolation distance.',
-        answers: [
-          { label: 'Yes / suspected', next: 'card-69.evacuations' },
-          { label: 'No', next: 'card-69.evacuations' }
-        ],
-        action: 'Keep caller at a safe distance; avoid attempting to extinguish industrial fires.'
-      },
-      'card-69.evacuations': {
-        prompt: 'Has anyone started evacuations or shelter-in-place?',
-        detail: 'Triggers alerts for multi-company response and notifications.',
-        answers: [
-          { label: 'Evacuations in progress', next: 'card-69.priority' },
-          { label: 'No evacuations yet', next: 'card-69.priority' }
-        ]
-      },
-      'card-69.wildland': {
-        prompt: 'How close is the fire to structures or people?',
-        detail: 'Evaluates threat to life and property for evacuations.',
-        answers: [
-          { label: '< 1/4 mile or impacting structures', next: 'card-69.winds' },
-          { label: 'Distant from structures', next: 'card-69.winds' }
-        ],
-        action: 'Advise caller to move upwind and prepare to evacuate if conditions change.'
-      },
-      'card-69.winds': {
-        prompt: 'What are the winds like?',
-        detail: 'Wind shifts inform spread potential and staging.',
-        answers: [
-          { label: 'Windy or shifting', next: 'card-69.priority' },
-          { label: 'Calm / light breeze', next: 'card-69.priority' }
-        ]
-      },
-      'card-69.priority': {
-        prompt: 'Dispatch priority',
-        answers: [],
-        outcome: 'Send full first-alarm assignment. Provide staging location and confirm hydrant availability.'
-      }
-    };
-
-    let protocols = JSON.parse(JSON.stringify(defaultProtocols));
-    let questions = JSON.parse(JSON.stringify(defaultQuestions));
+    let { protocols, questions } = loadData();
 
     let state = {
       protocolId: null,
@@ -479,17 +238,6 @@
     const codeInput = document.getElementById('codeInput');
     const protocolCodes = document.getElementById('protocolCodes');
     const copyButton = document.getElementById('copyTranscript');
-    const toggleAdminBtn = document.getElementById('toggleAdmin');
-    const adminPanel = document.getElementById('adminPanel');
-    const protocolEditor = document.getElementById('protocolEditor');
-    const questionEditor = document.getElementById('questionEditor');
-    const saveAdminBtn = document.getElementById('saveAdmin');
-    const loadDefaultsBtn = document.getElementById('loadDefaults');
-
-    function cloneDefaults() {
-      protocols = JSON.parse(JSON.stringify(defaultProtocols));
-      questions = JSON.parse(JSON.stringify(defaultQuestions));
-    }
 
     function renderProtocols() {
       protocolList.innerHTML = '';
@@ -522,98 +270,89 @@
       renderTranscript();
     }
 
-    function startProtocolByCode(value) {
-      const normalized = (value || '').trim().toLowerCase();
-      if (!normalized) return;
-      const exact = protocols.find((p) => p.id.toLowerCase() === normalized);
-      const partials = protocols.filter((p) => p.id.toLowerCase().startsWith(normalized) || p.name.toLowerCase().includes(normalized));
-      const target = exact || (normalized.length >= 3 ? partials[0] : null);
-      if (target) {
-        startProtocol(target.id);
-      }
+    function startProtocolByCode(code) {
+      const match = protocols.find((p) => p.id.toLowerCase() === code.toLowerCase());
+      if (match) startProtocol(match.id);
     }
 
     function renderQuestion() {
-      const node = questions[state.currentQuestion];
-      const options = node?.answers ?? [];
       questionCard.innerHTML = '';
+      if (!state.currentQuestion) {
+        const title = document.createElement('h3');
+        title.className = 'question-title';
+        title.textContent = 'Choose a protocol to begin';
+        const hint = document.createElement('p');
+        hint.className = 'hint';
+        hint.textContent = 'No active questionnaire.';
+        questionCard.append(title, hint);
+        return;
+      }
+
+      const node = questions[state.currentQuestion];
+      if (!node) return;
 
       const title = document.createElement('h3');
       title.className = 'question-title';
-      title.textContent = node ? node.prompt : 'Choose a protocol to begin';
+      title.textContent = node.prompt;
       questionCard.appendChild(title);
 
-      if (node?.detail) {
+      if (node.detail) {
         const detail = document.createElement('p');
         detail.className = 'hint';
         detail.textContent = node.detail;
         questionCard.appendChild(detail);
       }
 
-      if (node?.action) {
-        const action = document.createElement('div');
-        action.className = 'pill';
-        action.style.background = 'rgba(34, 197, 94, 0.08)';
-        action.style.borderColor = 'rgba(34, 197, 94, 0.4)';
-        action.style.color = 'var(--success)';
-        action.textContent = node.action;
-        questionCard.appendChild(action);
-      }
-
       const meta = document.createElement('div');
       meta.className = 'meta';
-      meta.innerHTML = `
-        <span class="pill">Protocol: ${state.protocolId ?? 'Not selected'}</span>
-        <span class="pill">Step ${state.stack.length + 1}</span>
-      `;
+      meta.innerHTML = `<span class="pill">${state.protocolId}</span><span class="pill">${node.answers?.length || 0} options</span>`;
       questionCard.appendChild(meta);
 
-      const optionsWrap = document.createElement('div');
-      optionsWrap.className = 'options';
+      const options = document.createElement('div');
+      options.className = 'options';
 
-      if (node?.outcome) {
-        const outcome = document.createElement('div');
-        outcome.className = 'outcome';
-        outcome.innerHTML = `<strong>Outcome</strong><div>${node.outcome}</div>`;
-        optionsWrap.appendChild(outcome);
+      if (node.answers?.length) {
+        node.answers.forEach((answer) => {
+          const btn = document.createElement('button');
+          btn.className = 'option';
+          btn.innerHTML = `<span>${answer.label}</span><span class="tag">Next: ${answer.next}</span>`;
+          btn.onclick = () => selectAnswer(answer);
+          options.appendChild(btn);
+        });
+      } else {
+        const none = document.createElement('p');
+        none.className = 'hint';
+        none.textContent = 'No selectable answers. See outcome below.';
+        options.appendChild(none);
       }
 
-      options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'option';
-        btn.innerHTML = `<span>${opt.label}</span><span class="tag">${String.fromCharCode(65 + idx)}</span>`;
-        btn.onclick = () => handleAnswer(node, opt);
-        optionsWrap.appendChild(btn);
-      });
+      questionCard.appendChild(options);
 
-      questionCard.appendChild(optionsWrap);
-
-      const footer = document.createElement('div');
-      footer.className = 'actions';
-
+      const actions = document.createElement('div');
+      actions.className = 'actions';
       const backBtn = document.createElement('button');
       backBtn.className = 'ghost-btn';
       backBtn.textContent = 'Back';
-      backBtn.disabled = state.stack.length === 0;
-      backBtn.onclick = () => goBack();
-      footer.appendChild(backBtn);
-
+      backBtn.onclick = goBack;
       const resetBtn = document.createElement('button');
-      resetBtn.className = 'primary-btn';
+      resetBtn.className = 'ghost-btn';
       resetBtn.textContent = 'Reset';
       resetBtn.onclick = reset;
-      footer.appendChild(resetBtn);
+      actions.append(backBtn, resetBtn);
+      questionCard.appendChild(actions);
 
-      questionCard.appendChild(footer);
+      if (node.action || node.outcome) {
+        const outcome = document.createElement('div');
+        outcome.className = 'outcome';
+        outcome.innerHTML = `<strong>Final Steps</strong><div>${[node.action, node.outcome].filter(Boolean).join(' ')}</div>`;
+        questionCard.appendChild(outcome);
+      }
     }
 
-    function handleAnswer(node, answer) {
-      if (!node) return;
-      state.transcript.push({ question: node.prompt, answer: answer.label });
-      if (answer.next) {
-        state.stack.push(state.currentQuestion);
-        state.currentQuestion = answer.next;
-      }
+    function selectAnswer(answer) {
+      state.stack.push(state.currentQuestion);
+      state.transcript.push({ question: questions[state.currentQuestion]?.prompt ?? '', answer: answer.label });
+      state.currentQuestion = answer.next;
       renderQuestion();
       renderTranscript();
     }
@@ -692,47 +431,17 @@
       });
     }
 
-    function populateEditors() {
-      protocolEditor.value = JSON.stringify(protocols, null, 2);
-      questionEditor.value = JSON.stringify(questions, null, 2);
-    }
-
-    function toggleAdmin() {
-      const isOpen = adminPanel.style.display === 'block';
-      adminPanel.style.display = isOpen ? 'none' : 'block';
-      toggleAdminBtn.textContent = isOpen ? 'Admin' : 'Close admin';
-      if (!isOpen) populateEditors();
-    }
-
-    function saveAdminChanges() {
-      try {
-        const updatedProtocols = JSON.parse(protocolEditor.value);
-        const updatedQuestions = JSON.parse(questionEditor.value);
-        if (!Array.isArray(updatedProtocols) || typeof updatedQuestions !== 'object') {
-          throw new Error('Invalid data shape.');
-        }
-        protocols = updatedProtocols;
-        questions = updatedQuestions;
-        reset();
-      } catch (err) {
-        alert('Unable to save: ' + err.message);
-      }
-    }
-
-    function loadDefaultData() {
-      cloneDefaults();
-      populateEditors();
+    function refreshFromStorage() {
+      const loaded = loadData();
+      protocols = loaded.protocols;
+      questions = loaded.questions;
       reset();
     }
 
     codeInput.addEventListener('input', (e) => startProtocolByCode(e.target.value));
     copyButton.addEventListener('click', copyTranscriptToClipboard);
-    toggleAdminBtn.addEventListener('click', toggleAdmin);
-    saveAdminBtn.addEventListener('click', saveAdminChanges);
-    loadDefaultsBtn.addEventListener('click', loadDefaultData);
+    window.addEventListener('storage', refreshFromStorage);
 
-    cloneDefaults();
-    populateEditors();
     renderProtocols();
     renderQuestion();
   </script>
